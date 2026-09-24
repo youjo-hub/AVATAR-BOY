@@ -1,0 +1,2548 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>アバターをゲームボーイに｜AVATAR BOY</title>
+<meta name="description" content="3Dアバターのデータを入れるだけで、ゲームボーイ／ゲームボーイカラー用のプレビューROMが作れる無料ツール。処理はすべてブラウザの中だけで完結し、どこにも送信しません。">
+
+<!-- SNSでリンクを共有したときのプレビュー用（OGP） -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://youjo-hub.github.io/AVATAR-BOY/">
+<meta property="og:title" content="アバターをゲームボーイに｜AVATAR BOY">
+<meta property="og:description" content="3Dアバターのデータを入れるだけで、ゲームボーイ／ゲームボーイカラー用のプレビューROMが作れる無料ツール。処理はすべてブラウザの中だけで完結します。">
+<meta property="og:image" content="https://youjo-hub.github.io/AVATAR-BOY/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="アバターをゲームボーイに｜AVATAR BOY">
+<meta name="twitter:description" content="3Dアバターのデータを入れるだけで、ゲームボーイ／ゲームボーイカラー用のプレビューROMが作れる無料ツール。">
+<meta name="twitter:image" content="https://youjo-hub.github.io/AVATAR-BOY/ogp.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AE%3C/text%3E%3C/svg%3E">
+
+<!-- Locks down what this page may load or connect to. The two script hashes are filled in by
+     build.sh from the exact inline script content, so any tampering breaks the hash and the
+     browser refuses to run it. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://cdn.jsdelivr.net 'sha256-WI9XfvbCIO6BN0LcdwbjqalvXOnYG+ECD7P/zjVubhw=' 'sha256-0mPblkz8q7FDw5W/HYgQPZmVCvuqqLFwMf46kmB3usY='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:; connect-src blob: data:; base-uri 'none'; form-action 'none'; object-src 'none';">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #e8e5ef; --paper-2: #dcd8e6; --ink: #25223a; --muted: #625d7a; --line: #c5bfd6;
+  --shell: #c8c5b5; --shell-hi: #ddd9c9; --shell-lo: #a5a293; --bezel: #575a51; --label: #b7bcad;
+  --shell-ink: #4a4d44; --dpad-color: #3d4039;
+  --key: #8f2b52; --key-hi: #a4375f; --key-ink: #f7e8ee; --focus: #7a5cff; --warn: #9a3b2e;
+  --lcd0: #9bbc0f; --lcd3: #0f380f;
+  --pad: clamp(16px, 4vw, 32px);
+  --f-dot: "DotGothic16", "Hiragino Maru Gothic ProN", "Yu Gothic", ui-monospace, monospace;
+  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1b1926; --paper-2: #24212f; --ink: #ebe8f5; --muted: #a8a3bf; --line: #3a3650;
+    --label: #8e88ad; --warn: #ff9f8c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1b1926; --paper-2: #24212f; --ink: #ebe8f5; --muted: #a8a3bf; --line: #3a3650;
+  --label: #8e88ad; --warn: #ff9f8c; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.75; }
+img, canvas { max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.page { max-width: 1060px; margin: 0 auto; padding: var(--pad); display: grid; gap: 28px;
+  grid-template-areas: "intro" "device" "work"; }
+.intro { grid-area: intro; max-width: 34em; }
+.stage { grid-area: device; display: flex; justify-content: center; }
+.work { grid-area: work; display: grid; gap: 22px; min-width: 0; }
+@media (min-width: 880px) {
+  .page { grid-template-columns: minmax(330px, 400px) 1fr; column-gap: 56px; row-gap: 20px;
+    grid-template-areas: "device intro" "device work"; align-items: start; }
+  .stage { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); }
+}
+
+h1 { font-family: var(--f-dot); font-weight: 400; font-size: clamp(1.9rem, 6vw, 2.6rem); line-height: 1.2; margin: 0 0 10px; letter-spacing: .01em; }
+.brandmark { text-align: right; line-height: 1; margin: 0 0 10px; user-select: none; }
+.bm-word { display: inline-block; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 900; font-style: italic; letter-spacing: -.01em; transform: skewX(-8deg); }
+.bm-avatar { display: inline-block; font-size: clamp(10px, 1.7vw, 13px); color: var(--muted); margin-right: 3px; vertical-align: 3px; }
+.bm-boy { display: inline-block; font-size: clamp(20px, 3.6vw, 30px); color: var(--ink); text-shadow: 1.5px 1.5px 0 var(--paper), 3px 3px 0 var(--line); }
+.bm-dash { display: inline-block; width: 46px; height: 3px; margin-top: 3px; border-radius: 2px;
+  background: linear-gradient(to right, #d64550 0 25%, #eab04d 25% 50%, #4f8f5c 50% 75%, #3c6fb0 75% 100%); }
+.intro p { margin: 0; color: var(--muted); }
+h2 { font-family: var(--f-dot); font-weight: 400; font-size: 1.08rem; margin: 0; }
+
+/* the handheld */
+.device { width: min(360px, 90vw); background: var(--shell); border-radius: 26px 26px 40px 40px; padding: 22px 22px 30px;
+  box-shadow: inset 0 2px 0 var(--shell-hi), inset 0 -7px 0 var(--shell-lo), 0 22px 36px -18px rgba(40, 38, 25, .45); }
+.bezel { background: var(--bezel); border-radius: 12px 12px 12px 12px; padding: 16px 16px 10px; position: relative; }
+.led { position: absolute; left: 7px; top: 50%; width: 5px; height: 5px; border-radius: 50%; background: #3b3847; transform: translateY(-50%); }
+.led.on { background: #ff5a4f; box-shadow: 0 0 6px #ff5a4f; }
+#screen { display: block; width: 100%; aspect-ratio: 160 / 144; image-rendering: pixelated; image-rendering: crisp-edges; background: var(--lcd0); border-radius: 2px; }
+.bezel-label { font-family: var(--f-dot); color: var(--label); font-size: 11px; letter-spacing: .08em; text-align: center; margin-top: 7px; }
+.pills { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; }
+.pill { border: 0; border-radius: 12px; padding: 5px 16px; background: var(--pad, #3d4039); background: var(--dpad-color); color: #e7e9e2;
+  font-family: var(--f-dot); font-size: .72rem; letter-spacing: .08em; cursor: pointer; transform: rotate(-8deg); }
+.pill[aria-pressed="true"] { background: var(--key); color: var(--key-ink); }
+.pill-cap { font-size: 11px; color: var(--shell-ink); }
+.tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tools .btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.tool-hint { font-size: .82rem; color: var(--muted); }
+.pads { display: flex; align-items: center; justify-content: space-between; margin-top: 30px; padding: 0 4px; }
+.dpad { position: relative; width: 104px; height: 104px; }
+.dpad::before, .dpad::after { content: ""; position: absolute; background: var(--dpad-color); border-radius: 6px; }
+.dpad::before { left: 35px; top: 0; width: 34px; height: 104px; }
+.dpad::after { top: 35px; left: 0; height: 34px; width: 104px; }
+.dpad button { position: absolute; z-index: 1; width: 36px; height: 36px; border: 0; background: transparent; border-radius: 6px; cursor: pointer; touch-action: manipulation; }
+.dpad button::after { content: ""; position: absolute; inset: 11px; background: #cfd2c7; }
+.dpad .left, .dpad .right { top: 34px; }
+.dpad .up, .dpad .down { left: 34px; }
+.dpad .left { left: 0; } .dpad .right { right: 0; }
+.dpad .up { top: 0; } .dpad .down { bottom: 0; }
+.dpad .left::after { clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+.dpad .right::after { clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.dpad .up::after { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.dpad .down::after { clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.dpad button:active { background: rgba(255,255,255,.08); }
+.keys { display: flex; gap: 16px; align-items: flex-start; }
+.key { display: grid; justify-items: center; gap: 6px; }
+.key button { width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--key); color: var(--key-ink); font-family: var(--f-dot); font-size: 1.05rem; cursor: pointer;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,.18), 0 3px 0 var(--shell-lo); touch-action: manipulation; }
+.key button:active, .key button[aria-pressed="true"] { transform: translateY(2px); box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 1px 0 var(--shell-lo); background: var(--key-hi); }
+.key span { font-size: 11px; color: var(--shell-ink); letter-spacing: .04em; }
+
+/* work column */
+.load { border: 2px dashed var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 10px; background: var(--paper-2); }
+.load.drag { border-color: var(--focus); }
+.load p { margin: 0; color: var(--muted); font-size: .9rem; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 12px; border: 2px solid var(--ink); background: transparent; cursor: pointer; font-weight: 700; }
+.btn.primary { background: var(--key); border-color: var(--key); color: var(--key-ink); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.load .btn { justify-self: start; }
+.status { min-height: 1.75em; font-size: .92rem; }
+.status.warn { color: var(--warn); }
+.export .hint-warn { color: var(--warn); }
+.export .hint-warn:empty { display: none; }
+
+details { border-top: 1px solid var(--line); padding-top: 14px; }
+summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--f-dot); color: var(--muted); font-size: 1.2rem; }
+details[open] summary::after { content: "−"; }
+.fields { display: grid; gap: 14px; margin-top: 14px; }
+.field { display: grid; grid-template-columns: 7.5em 1fr 3.4em; align-items: center; gap: 10px; }
+.field label, .field .lbl { font-size: .92rem; }
+.field output { font-family: var(--f-dot); font-size: .9rem; text-align: right; color: var(--muted); }
+.field input[type=range] { width: 100%; accent-color: var(--shell-hi); }
+.field.wide { grid-template-columns: 7.5em 1fr; }
+.field .note { grid-column: 2 / -1; font-size: .82rem; color: var(--muted); margin-top: -8px; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; justify-self: start; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: 5px 13px; font-size: .9rem; }
+.seg input:checked + span { background: var(--ink); color: var(--paper); }
+.seg input:disabled + span { opacity: .4; cursor: not-allowed; }
+.seg input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: .92rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--shell-hi); }
+.text { width: 100%; min-height: 40px; padding: 6px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--paper); font-family: var(--f-dot); letter-spacing: .04em; }
+.parts { display: grid; gap: 6px; max-height: 240px; overflow: auto; padding-right: 4px; }
+.parts .check { font-size: .88rem; word-break: break-all; }
+.part { display: grid; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.part:last-child { border-bottom: 0; }
+.part .check { font-weight: 700; }
+.mat { display: grid; grid-template-columns: 18px 26px 1fr minmax(0, 40%); gap: 8px; align-items: center; padding-left: 20px; }
+.mat input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--shell-hi); margin: 0; }
+.mat.noTex { grid-template-columns: 18px 1fr; }
+.shape { display: grid; grid-template-columns: minmax(0, 11em) 1fr 3.2em; gap: 8px; align-items: center; padding: 3px 0; }
+.shape label { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shape input[type=range] { width: 100%; accent-color: var(--shell-hi); }
+.shape output { font-family: var(--f-dot); font-size: .8rem; text-align: right; color: var(--muted); }
+.filter { font-family: var(--f-body); font-size: .85rem; letter-spacing: 0; }
+.btn.small { min-height: 36px; padding: 0 14px; font-size: .85rem; justify-self: start; }
+.matname { font-size: .82rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thumb { width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid var(--line); overflow: hidden; display: block; background: var(--paper); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.texsel { width: 100%; padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--paper); font-size: .8rem; }
+.parts { max-height: 320px; }
+.empty-note { color: var(--muted); font-size: .88rem; margin: 0; }
+
+.export { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 18px; }
+.export .row { display: flex; flex-wrap: wrap; gap: 10px; }
+.export p { margin: 0; color: var(--muted); font-size: .86rem; }
+.terms-notice { margin-top: 10px; font-size: .82rem; color: var(--muted); }
+.terms-notice a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+.legal { max-width: 1060px; margin: 8px auto 0; padding: 0 var(--pad) calc(32px + env(safe-area-inset-bottom, 0px)); }
+.legal > details { border-top: 1px solid var(--line); padding-top: 16px; }
+.legal summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.legal summary::-webkit-details-marker { display: none; }
+.legal summary h2 { font-family: var(--f-dot); font-weight: 400; font-size: 1.02rem; margin: 0; }
+.legal summary::after { content: "−"; font-family: var(--f-dot); color: var(--muted); font-size: 1.2rem; }
+.legal details:not([open]) summary::after { content: "+"; }
+.terms-body { margin-top: 14px; font-size: .86rem; line-height: 1.85; color: var(--ink); max-width: 68ch; }
+.terms-body h3 { font-family: var(--f-dot); font-weight: 400; font-size: .92rem; margin: 22px 0 6px; }
+.terms-body h3:first-of-type { margin-top: 14px; }
+.terms-body p { margin: 0 0 10px; color: var(--muted); }
+.terms-body ol { margin: 0 0 10px; padding-left: 1.4em; color: var(--muted); display: grid; gap: 4px; }
+.terms-body a { color: inherit; }
+.terms-date { margin-top: 18px; font-size: .8rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="intro">
+    <div class="brandmark" aria-hidden="true">
+      <span class="bm-word"><span class="bm-avatar">AVATAR</span><span class="bm-boy">BOY</span></span>
+      <span class="bm-dash"></span>
+    </div>
+    <h1>アバターを<br>ゲームボーイに</h1>
+    <p>モデルを入れると、十字キーでくるっと回せるゲームボーイ用のROMができます。<br>ファイルはこの端末の中だけで処理され、どこにも送られません。</p>
+    <p class="terms-notice">このページをご覧になった時点で<a href="#terms">利用規約</a>に同意したものとみなします。</p>
+  </header>
+
+  <section class="stage" aria-label="プレビュー">
+    <div class="device">
+      <div class="bezel">
+        <span class="led" id="led" aria-hidden="true"></span>
+        <canvas id="screen" width="160" height="144" role="img" aria-label="ゲームボーイの画面プレビュー"></canvas>
+        <div class="bezel-label">AVATAR VIEWER</div>
+      </div>
+      <div class="pads">
+        <div class="dpad">
+          <button class="up" id="btnUp" aria-label="上：寄る"></button>
+          <button class="down" id="btnDown" aria-label="下：引く"></button>
+          <button class="left" id="btnLeft" aria-label="左に回す"></button>
+          <button class="right" id="btnRight" aria-label="右に回す"></button>
+        </div>
+        <div class="keys">
+          <div class="key"><button id="btnB" aria-pressed="false" aria-label="B：色を反転">B</button><span>反転</span></div>
+          <div class="key"><button id="btnA" aria-pressed="false" aria-label="A：自動で回す">A</button><span>自動</span></div>
+        </div>
+      </div>
+      <div class="pills">
+        <button class="pill" id="btnSelect" type="button" aria-pressed="false" aria-label="SELECT：上下の動きをズームに切り替える">SELECT</button>
+        <span class="pill-cap" id="selectCap">上下で移動</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="work">
+    <section class="load" id="dropZone">
+      <h2>モデルを入れる</h2>
+      <p>FBX・VRM に対応しています。FBXは使っているテクスチャ（PNG・JPG・PSD）も一緒に選んでください。顔や髪が白いままのときは「パーツとテクスチャ」でマテリアルごとに画像を選べます。</p>
+      <button class="btn primary" id="pickBtn" type="button">ファイルを選ぶ</button>
+      <input id="fileInput" type="file" multiple hidden>
+      <div class="status" id="status" role="status" aria-live="polite">まだモデルが入っていません。</div>
+    </section>
+
+    <details open>
+      <summary><h2>向きと大きさ</h2></summary>
+      <div class="fields">
+        <div class="field"><label for="startDeg">正面の向き</label><input type="range" id="startDeg" min="0" max="345" step="15" value="0"><output id="startDegOut"></output></div>
+        <div class="field"><label for="elev">見下ろす角度</label><input type="range" id="elev" min="0" max="30" step="1" value="8"><output id="elevOut"></output></div>
+        <div class="field"><label for="arms">腕を下ろす</label><input type="range" id="arms" min="0" max="80" step="5" value="0" disabled><output id="armsOut"></output>
+          <div class="note" id="armsNote">Tポーズのモデルで腕を体に寄せます。</div></div>
+        <div class="field"><label for="size">大きさ</label><input type="range" id="size" min="60" max="100" step="5" value="100"><output id="sizeOut"></output>
+          <div class="note" id="shrinkHint"></div></div>
+        <p class="empty-note">上下の移動は10段、向きの数は32方向に固定しています。ズームはSELECTを押しながら十字キー上下で切り替えます（5段、全身から顔まで）。</p>
+      </div>
+    </details>
+
+    <details open>
+      <summary><h2>色と線</h2></summary>
+      <div class="fields">
+        <p class="empty-note">ROMはゲームボーイカラー用のカラー版で書き出します。初代ゲームボーイに挿しても白黒として起動できます。</p>
+        <div class="field wide"><span class="lbl" id="bgLbl">背景の色</span>
+          <div class="seg" role="radiogroup" aria-labelledby="bgLbl">
+            <label><input type="radio" name="bg" value="white" checked><span>しろ</span></label>
+            <label><input type="radio" name="bg" value="sky"><span>そら</span></label>
+            <label><input type="radio" name="bg" value="sakura"><span>さくら</span></label>
+            <label><input type="radio" name="bg" value="night"><span>よる</span></label>
+          </div></div>
+        <div class="field wide"><span class="lbl">明るさ</span><label class="check"><input type="checkbox" id="autoLevels" checked>モデルに合わせて自動調整</label>
+          <div class="note">テクスチャの明るさが近いときに、濃淡をはっきりさせます。</div></div>
+        <div class="field"><label for="brightness">明るさ</label><input type="range" id="brightness" min="-30" max="30" step="2" value="0"><output id="brightnessOut"></output></div>
+        <div class="field"><label for="contrast">コントラスト</label><input type="range" id="contrast" min="60" max="160" step="5" value="110"><output id="contrastOut"></output></div>
+        <div class="field"><label for="shading">陰影</label><input type="range" id="shading" min="0" max="100" step="5" value="60"><output id="shadingOut"></output></div>
+        <div class="field wide"><span class="lbl" id="ditherLbl">ディザ</span>
+          <div class="seg" role="radiogroup" aria-labelledby="ditherLbl">
+            <label><input type="radio" name="dither" value="none" checked><span>なし</span></label>
+            <label><input type="radio" name="dither" value="fs"><span>誤差拡散</span></label>
+          </div></div>
+        <div class="field wide"><span class="lbl" id="smoothLbl">ノイズ除去</span>
+          <div class="seg" role="radiogroup" aria-labelledby="smoothLbl">
+            <label><input type="radio" name="smooth" value="0"><span>なし</span></label>
+            <label><input type="radio" name="smooth" value="1" checked><span>ふつう</span></label>
+            <label><input type="radio" name="smooth" value="2"><span>強め</span></label>
+          </div>
+          <div class="note">ぽつんと浮いたドットを周りになじませます。線は残ります。</div></div>
+        <div class="field wide"><span class="lbl" id="outlineLbl">輪郭</span>
+          <div class="seg" role="radiogroup" aria-labelledby="outlineLbl">
+            <label><input type="radio" name="outline" value="outer" checked><span>外側</span></label>
+            <label><input type="radio" name="outline" value="inner"><span>内側</span></label>
+            <label><input type="radio" name="outline" value="none"><span>なし</span></label>
+          </div></div>
+        <div class="field wide"><span class="lbl">足元</span><label class="check"><input type="checkbox" id="shadow" checked>影を描く</label></div>
+        <div class="field wide"><span class="lbl">テクスチャ</span><label class="check"><input type="checkbox" id="cutout" checked>透明な部分を抜く</label>
+          <div class="note">髪やまつ毛の板ポリが顔を隠してしまうときに使います。</div></div>
+      </div>
+    </details>
+
+    <details id="partsDetails">
+      <summary><h2>パーツとテクスチャ</h2></summary>
+      <div class="fields">
+        <p class="empty-note" id="partsEmpty">モデルを入れると、パーツごとの表示切り替えと、マテリアルごとのテクスチャ指定ができます。</p>
+        <div class="tools">
+          <button class="btn small" id="eraser" type="button" aria-pressed="false">消しゴム</button>
+          <button class="btn small" id="eraseUndo" type="button" disabled>元に戻す</button>
+          <span class="tool-hint" id="eraseHint"></span>
+        </div>
+        <p class="empty-note">消しゴムをオンにして画面をタップすると、その部分のつながった形だけを消せます。</p>
+        <input class="text filter" id="partFilter" type="search" placeholder="パーツ名でしぼり込む" aria-label="パーツ名でしぼり込む">
+        <div class="parts" id="parts"></div>
+        <p class="empty-note">チェックを外すと、そのパーツやマテリアルだけ消せます。アホ毛や靴などを消したいときに使ってください。</p>
+      </div>
+    </details>
+
+    <details id="shapeDetails" hidden>
+      <summary><h2>シェイプキー</h2></summary>
+      <div class="fields">
+        <p class="empty-note">アホ毛や服を消すシェイプキーがあれば、ここで動かせます（<span id="shapeCount"></span>）。</p>
+        <input class="text filter" id="shapeFilter" type="search" placeholder="キー名でしぼり込む" aria-label="シェイプキー名でしぼり込む">
+        <div class="parts" id="shapes"></div>
+        <p class="empty-note" id="shapeMore"></p>
+        <button class="btn small" id="shapeReset" type="button">元に戻す</button>
+      </div>
+    </details>
+
+    <details open>
+      <summary><h2>ROMの設定</h2></summary>
+      <div class="fields">
+        <div class="field wide"><label for="name">名前（英数字）</label><input class="text" id="name" maxlength="14" autocomplete="off" spellcheck="false" placeholder="MY AVATAR"></div>
+        <div class="field"><label for="speed">回る速さ</label><input type="range" id="speed" min="3" max="20" step="1" value="8"><output id="speedOut"></output></div>
+        <div class="field wide"><span class="lbl">起動時</span><label class="check"><input type="checkbox" id="autoStart" checked>自動で回しておく</label></div>
+      </div>
+    </details>
+
+    <section class="export">
+      <h2>書き出し</h2>
+      <div class="row">
+        <button class="btn primary" id="saveRom" disabled>ROMをダウンロード（.zip）</button>
+        <button class="btn" id="saveGif" disabled>回転GIFを保存</button>
+      </div>
+      <p>zipには .gb ファイル、回転GIF、説明書が入っています。mGBAなどのエミュレータか、MBC5対応のフラッシュカートで起動できます。十字キーの左右で回転、上下で見る場所の移動、SELECT＋上下でズーム、Aで自動回転、Bで色の反転です。</p>
+      <p class="hint-warn" id="exportHint"></p>
+      <p>アバターの画像やROMを公開するときは、モデルの利用規約を確認してください。</p>
+    </section>
+  </div>
+</main>
+
+<footer class="legal">
+  <details id="terms" open>
+    <summary><h2>利用規約</h2></summary>
+    <div class="terms-body">
+      <p>本規約は、本ツール「AVATAR BOY（アバターをゲームボーイに）」（以下「本ツール」）の利用条件を定めるものです。本ページを閲覧した時点で、利用者は本規約の内容に同意したものとみなします。</p>
+
+      <h3>第1条（本ツールの内容）</h3>
+      <p>本ツールは、利用者がアップロードした3Dモデルデータをもとに、ゲームボーイおよびゲームボーイカラー用のプレビューROMファイル等を生成する無料のツールです。</p>
+
+      <h3>第2条（同意）</h3>
+      <p>利用者は、本ツールを閲覧・利用した時点で、本規約の内容に同意したものとみなします。本規約の内容に同意できない場合、利用者は本ツールの利用を控えてください。</p>
+
+      <h3>第3条（データの取り扱い）</h3>
+      <ol>
+        <li>本ツールは、アップロードされたモデルデータおよび画像データを利用者の端末（ブラウザ）内でのみ処理し、運営者のサーバーその他の外部へ送信・保存することはありません。</li>
+        <li>本ツールはアップロードされたデータの保存・バックアップを行いません。データや生成物が失われた場合について、運営者は責任を負いません。</li>
+        <li>本ページの表示に必要なフォント（Google Fonts）およびプログラム（jsDelivr経由のthree.js）を読み込むため、閲覧時にこれらの配信元との通信が発生します。この通信にアップロードされたデータは含まれません。</li>
+      </ol>
+
+      <h3>第4条（アバター素材の権利について）</h3>
+      <ol>
+        <li>利用者が本ツールにアップロードするモデルデータ、テクスチャその他の素材（以下「アバター素材」）に関する著作権・利用許諾条件の確認および遵守は、すべて利用者自身の責任で行うものとします。</li>
+        <li>利用者は、アバター素材について、本ツールを用いて変換・改変・保存・共有等を行う正当な権利を有していることを保証するものとします。</li>
+        <li>アバター素材の利用規約・ガイドライン等に違反したことにより利用者と第三者との間に生じた紛争について、運営者は一切の責任を負いません。</li>
+      </ol>
+
+      <h3>第5条（知的財産権）</h3>
+      <ol>
+        <li>本ツール自体（プログラム、デザイン、文章等を含む）に関する知的財産権は、運営者または正当な権利者に帰属します。</li>
+        <li>本ツールを用いて利用者が生成したROMファイル・GIF画像等の生成物に関する権利は、当該生成物の元となったアバター素材の権利者に帰属するものとし、運営者は当該生成物についていかなる権利も主張しません。</li>
+      </ol>
+
+      <h3>第6条（商用利用の禁止・クレジット表記）</h3>
+      <ol>
+        <li>本ツールを利用して生成したROMファイル・画像・動画等を、有償で販売・配布する行為その他対価を得ることを目的として提供する行為を禁止します。</li>
+        <li>動画投稿・生配信等で本ツールまたはその生成物を使用・紹介することは自由に行えますが、その際は本ツールの名称（「AVATAR BOY」）および入手先（https://youjo-hub.github.io/AVATAR-BOY/）を明記してください。</li>
+      </ol>
+
+      <h3>第7条（禁止事項）</h3>
+      <p>利用者は、本ツールの利用にあたり、以下の行為を行ってはならないものとします。</p>
+      <ol>
+        <li>他者の著作権、肖像権その他の権利を侵害する行為</li>
+        <li>法令または公序良俗に違反する行為</li>
+        <li>本ツールの脆弱性を悪用する行為、本ツールの運営を妨害する行為</li>
+        <li>その他、運営者が不適切と判断する行為</li>
+      </ol>
+
+      <h3>第8条（免責事項）</h3>
+      <ol>
+        <li>本ツールは現状有姿（as-is）で提供されるものとし、運営者は本ツールの動作、正確性、安全性、特定の目的への適合性等についていかなる保証も行いません。</li>
+        <li>本ツールにより生成されたROMファイルが、実機（ゲームボーイ／ゲームボーイカラー）およびエミュレータにおいて正常に動作することを保証するものではありません。</li>
+        <li>本ツールの利用により利用者に生じた損害について、運営者は理由の如何を問わず一切の責任を負いません。</li>
+      </ol>
+
+      <h3>第9条（サービス内容の変更・停止）</h3>
+      <p>運営者は、利用者への事前の通知なく、本ツールの内容を変更し、または提供を中断・終了することができるものとします。これにより利用者に生じた損害について、運営者は責任を負いません。</p>
+
+      <h3>第10条（規約の変更）</h3>
+      <p>運営者は、必要と判断した場合、利用者への通知なく本規約を変更できるものとします。変更後の規約は、本ページに掲載された時点から効力を生じるものとします。</p>
+
+      <h3>第11条（準拠法・管轄裁判所）</h3>
+      <p>本規約の解釈にあたっては日本法を準拠法とします。本ツールに関して利用者と運営者との間に紛争が生じた場合には、運営者の所在地を管轄する裁判所を第一審の専属的合意管轄裁判所とします。</p>
+
+      <h3>第12条（お問い合わせ）</h3>
+      <p>本ツールに関するお問い合わせは、以下の窓口までご連絡ください。<br>
+      X（旧Twitter）：<a href="https://x.com/youjo_____?s=11" target="_blank" rel="noopener noreferrer">https://x.com/youjo_____?s=11</a></p>
+
+      <p class="terms-date">制定日：2026年9月24日</p>
+    </div>
+  </details>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js" integrity="sha384-vV17nr/rMaJqmeZkFUzXLpHdQ+ME5QHKdydaqqN+3Ga39RJlNrTatJxHwGV4ml2C" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/libs/fflate.min.js" integrity="sha384-z5TPRpmZ+60mv8LqyHeCA0HTTbGjLyhJPjpEb4c4mgqrdWC1zM5Sn5pSRmknOjK8" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/FBXLoader.js" integrity="sha384-EozoM3loWIoL1O7kvWjrs4nSeqFuV6Dmx2DUZXX9PT2IabU3HxJEi9VbrSt3c2xr" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-FassWWYNEPQsuRQm+59KIMcDetEc30bNyE9yfx16Ok8lvoowyH81LtrPmLWltJMh" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/TGALoader.js" integrity="sha384-eUvbILM59AQAsbfwYitcGBXTw9g8yOWPVKFyV9Kz113bb49vYIyJvvLfjvqgLZzM" crossorigin="anonymous"></script>
+<script>
+/* Game Boy avatar viewer core: pure data functions (no DOM). */
+(function (root) {
+  'use strict';
+  const TEMPLATE_B64 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDUAHO7WZmzA0ACwNzAIMADAANAAgRH4iJAA7czG7m3d3Zmbu7Z2NuDuzM3dyZn7u5Mz5BVkFUQVJWSUVXAAAAAAAAAAAAGQAAAAAA1C9XR/MxAOCv6gjA6gnAeP4RIAv6BBCnKAU+AeoIwK/g/+Am8ET+kDj6r+BA+gjApygcPgHgTyEAmAEACK8iC1d4sXog+K/gTyEAKM0kBCEAHxEAiAEACM0xBCEAHREAmM06BCEAHREAnM06BK/qAMDqCsDqC8DqBMDqBcDqBsD6AhDqAsD6ARDqA8A+AeoBwM0bA6/qAcDgQ+BCPuTgRz6R4EDNTwTNXAT6BcAvR/oEwKBPy0koIvoIwKcoF/oJwO4B6gnAKAUhQCgYAyEAKM0kBBgF8Ecv4Ed55gkoDvoCwO4B6gLA+gEQ6gPAy3EgSMt5IFnLYcLcAstpwu4C+gTA5jAoGfoGwD3qBsAgED4G6gbA+gTAy2fC4QLD8wL6AsCnyvEB+gPAPeoDwMLxAfoBEOoDwMPhAvoEwMtXICf6C8CnyvEBPeoLwMPXAvoEwMtXICfNAQRH+gvAPLjS8QHqC8DD1wL6BRBH+grAPLjS8QHqCsDNEgTD1wL6CsCnyvEBPeoKwM0SBPoAwBghPhDqBsD6AMA8IQAQvjgSrxgPPhDqBsD6AMCnIAP6ABA96gDAzRsDzU8E+gHA7gHqAcAoBD6JGAI+keBAw/EB+grAh18WACEQEBkjfiELwIZH+gDAbyYA+gAQXxYAeKcoBBkFIPwpKREAERkq6gAgKl8qV04GAMshyxDLIcsQyyHLEMshyxDV+gHApyAHIQCQPpwYBSEAgD6Y6gfAzfID0XrGCFf6B8BnLgABIQAJBhDFARIAzfIDAQ4ACcEFIPH6CMCnKCI+AeBP+gfAZy4AASEACQYQxQESAM3yAwEOAAnBBSDxr+BP+gDAPAYA/go4BdYKBBj3T/oDEF/6B8DGAmcuLPBB5gIg+niDIvBB5gIg+nmDd8nwQeYCIPoaIhMLeLEg8snl1foKwIdfFgAhEBAZftHhyc0BBD1H+gvAuDgGKAR46gvAyT6A4GgGQCrgaQUg+skqEhMLeLEg+MkGEg4UKhITDSD6e8YMXzABFAUg7snwRP6QMPrwRP6QOPrJ+gTA6gXAPiDgAPAA8AAv5g/LN0c+EOAA8ADwAPAA8ADwAPAAL+YPsOoEwD4w4ADJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==';
+  const FONT_HEX = '0000000000000000183c3c1818001800363600000000000036367f367f3636000c3e031e301f0c00006333180c6663001c361c6e3b336e000606030000000000180c0606060c1800060c1818180c060000663cff3c660000000c0c3f0c0c000000000000000c0c060000003f0000000000000000000c0c006030180c060301003e63737b6f673e000c0e0c0c0c0c3f001e33301c06333f001e33301c30331e00383c36337f3078003f031f3030331e001c06031f33331e003f3330180c0c0c001e33331e33331e001e33333e30180e00000c0c00000c0c00000c0c00000c0c06180c0603060c180000003f00003f0000060c1830180c06001e3330180c000c003e637b7b7b031e000c1e33333f3333003f66663e66663f003c66030303663c001f36666666361f007f46161e16467f007f46161e16060f003c66030373667c003333333f333333001e0c0c0c0c0c1e007830303033331e006766361e366667000f06060646667f0063777f7f6b63630063676f7b736363001c36636363361c003f66663e06060f001e3333333b1e38003f66663e366667001e33070e38331e003f2d0c0c0c0c1e003333333333333f0033333333331e0c006363636b7f7763006363361c1c3663003333331e0c0c1e007f6331184c667f001e06060606061e0003060c18306040001e18181818181e00081c36630000000000000000000000ff0c0c18000000000000001e303e336e000706063e66663b0000001e3303331e003830303e33336e0000001e333f031e001c36060f06060f0000006e33333e301f0706366e666667000c000e0c0c0c1e00300030303033331e070666361e3667000e0c0c0c0c0c1e000000337f7f6b630000001f333333330000001e3333331e0000003b66663e060f00006e33333e307800003b6e66060f0000003e031e301f00080c3e0c0c2c18000000333333336e0000003333331e0c000000636b7f7f3600000063361c36630000003333333e301f00003f190c263f00380c0c070c0c38001818180018181800070c0c380c0c07006e3b000000000000';
+  const REG_W = 18, REG_H = 16, REG_PX_W = REG_W * 8, REG_PX_H = REG_H * 8;
+  const CNT_COL = 12, CNT_ROW = 17, MAX_NAME = 14;
+  const MAP_OFS = 0x800, ATTR_OFS = 0x920;
+  const recordBytes = (color) => (color ? 0x0A40 : 0x0920);
+  const perBank = (color) => Math.floor(0x4000 / recordBytes(color));
+  function romSize(records, color) {
+    const need = 1 + Math.ceil(records / perBank(color));
+    let banks = 2; while (banks < need) banks *= 2;
+    return banks * 0x4000;
+  }
+  const ADDR = { count: 0x1000, speed: 0x1001, auto: 0x1002, digit: 0x1003, color: 0x1004, zoom: 0x1005,
+    zoomTable: 0x1010, table: 0x1100, staticMap: 0x1D00, shared: 0x1F00, palA: 0x2800, palB: 0x2840 };
+  const MAX_RECORDS = 768;
+
+  function b64ToBytes(b64) {
+    if (typeof atob === 'function') {
+      const s = atob(b64), u = new Uint8Array(s.length);
+      for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+      return u;
+    }
+    return new Uint8Array(Buffer.from(b64, 'base64'));
+  }
+
+  function glyph(ch) {
+    let c = ch.charCodeAt(0);
+    if (c < 0x20 || c > 0x7e) c = 0x3f;
+    const o = (c - 0x20) * 16, rows = [];
+    for (let r = 0; r < 8; r++) rows.push(parseInt(FONT_HEX.substr(o + r * 2, 2), 16));
+    return rows; // bit 0 is the leftmost pixel
+  }
+  function encodeTile(levels) {
+    const out = new Uint8Array(16);
+    for (let y = 0; y < 8; y++) {
+      let lo = 0, hi = 0;
+      for (let x = 0; x < 8; x++) {
+        const v = levels[y * 8 + x];
+        lo |= (v & 1) << (7 - x); hi |= ((v >> 1) & 1) << (7 - x);
+      }
+      out[y * 2] = lo; out[y * 2 + 1] = hi;
+    }
+    return out;
+  }
+  function decodeTile(bytes, off, dst, dstW, dx, dy) {
+    for (let y = 0; y < 8; y++) {
+      const lo = bytes[off + y * 2], hi = bytes[off + y * 2 + 1];
+      for (let x = 0; x < 8; x++) {
+        const b = 7 - x;
+        dst[(dy + y) * dstW + dx + x] = ((lo >> b) & 1) | (((hi >> b) & 1) << 1);
+      }
+    }
+  }
+  function patternTile(rows) {
+    const lv = new Uint8Array(64);
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) lv[y * 8 + x] = +rows[y][x];
+    return encodeTile(lv);
+  }
+  function glyphTile(ch) {
+    const g = glyph(ch), lv = new Uint8Array(64);
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) lv[y * 8 + x] = (g[y] >> x) & 1 ? 3 : 0;
+    return encodeTile(lv);
+  }
+
+  const P = {
+    H:  ['00000000','00000000','00000000','33333333','33333333','00000000','00000000','00000000'],
+    V:  ['00033000','00033000','00033000','00033000','00033000','00033000','00033000','00033000'],
+    TL: ['00000000','00000000','00000000','00000333','00003333','00033000','00033000','00033000'],
+    TR: ['00000000','00000000','00000000','33300000','33330000','00033000','00033000','00033000'],
+    BL: ['00033000','00033000','00033000','00003333','00000333','00000000','00000000','00000000'],
+    BR: ['00033000','00033000','00033000','33330000','33300000','00000000','00000000','00000000'],
+  };
+
+  function sanitizeName(name) {
+    let s = String(name || '').replace(/[^\x20-\x7e]/g, '').trim();
+    if (!s) s = 'MY AVATAR';
+    return s.slice(0, MAX_NAME);
+  }
+
+  function buildStatic(name, total) {
+    const tiles = [], index = new Map();
+    const add = (bytes, dedupe = true) => {
+      const key = Array.from(bytes).join(',');
+      if (dedupe && index.has(key)) return index.get(key);
+      const id = 128 + tiles.length; tiles.push(bytes); index.set(key, id); return id;
+    };
+    const BLANK = add(new Uint8Array(16));
+    const digitBase = 128 + tiles.length;
+    for (let d = 0; d < 10; d++) add(glyphTile(String(d)), false);
+    const T = {}; for (const k in P) T[k] = add(patternTile(P[k]));
+    const ch = (c) => c === ' ' ? BLANK : add(glyphTile(c));
+    const map = new Uint8Array(20 * 18).fill(BLANK);
+    const put = (x, y, t) => { map[y * 20 + x] = t; };
+    const nm = sanitizeName(name);
+    put(0, 0, T.TL); put(19, 0, T.TR);
+    for (let x = 1; x < 19; x++) put(x, 0, T.H);
+    put(2, 0, BLANK);
+    for (let i = 0; i < nm.length; i++) put(3 + i, 0, ch(nm[i]));
+    put(3 + nm.length, 0, BLANK);
+    for (let y = 1; y < 17; y++) { put(0, y, T.V); put(19, y, T.V); }
+    put(0, 17, T.BL); put(19, 17, T.BR);
+    for (let x = 1; x < 19; x++) put(x, 17, T.H);
+    [2, 4, 6, 11, 17].forEach((x) => put(x, 17, BLANK));
+    put(3, 17, ch('<')); put(5, 17, ch('>'));
+    const tt = String(total).padStart(2, '0');
+    put(CNT_COL, 17, digitBase); put(CNT_COL + 1, 17, digitBase + 1);
+    put(CNT_COL + 2, 17, ch('/'));
+    put(CNT_COL + 3, 17, digitBase + +tt[0]); put(CNT_COL + 4, 17, digitBase + +tt[1]);
+    if (tiles.length > 128) throw new Error('too many shared tiles');
+    const shared = new Uint8Array(2048);
+    tiles.forEach((t, i) => shared.set(t, i * 16));
+    return { shared, map, digitBase, blank: BLANK, name: nm };
+  }
+
+  // region levels (144x128) + optional per-cell palette -> tiles, map, attributes.
+  // Only 128 tile patterns fit in one buffer. Patterns are merged inside a palette group,
+  // never across groups: the same index means a different colour under another palette.
+  function tileDist(a, b, bail) {
+    let d = 0;
+    for (let q = 0; q < 64; q++) { const f = a[q] - b[q]; d += f * f; if (d >= bail) return d; }
+    return d;
+  }
+  function pickRepresentatives(items, quota) {
+    if (items.length <= quota) return items.map((t) => t.lv);
+    const near = new Float64Array(items.length).fill(Infinity);
+    const taken = new Uint8Array(items.length);
+    let seed = 0;
+    for (let i = 1; i < items.length; i++) if (items[i].count > items[seed].count) seed = i;
+    const reps = [];
+    let pick = seed;
+    while (reps.length < quota) {
+      taken[pick] = 1; reps.push(items[pick].lv);
+      const lv = items[pick].lv;
+      let next = -1, bestScore = -1;
+      for (let i = 0; i < items.length; i++) {
+        if (taken[i]) continue;
+        const d = tileDist(items[i].lv, lv, Infinity);
+        if (d < near[i]) near[i] = d;
+        const score = near[i] * Math.sqrt(items[i].count);
+        if (score > bestScore) { bestScore = score; next = i; }
+      }
+      if (next < 0) break;
+      pick = next;
+    }
+    // two rounds of "assign, then move each representative to the middle of its group"
+    let cur = reps;
+    for (let pass = 0; pass < 2; pass++) {
+      const owner = new Int32Array(items.length);
+      for (let i = 0; i < items.length; i++) {
+        let best = 0, bd = Infinity;
+        for (let k = 0; k < cur.length; k++) {
+          const d = tileDist(items[i].lv, cur[k], bd);
+          if (d < bd) { bd = d; best = k; }
+        }
+        owner[i] = best;
+      }
+      if (pass === 1) break;
+      const sum = new Float64Array(cur.length * 64), wsum = new Float64Array(cur.length);
+      for (let i = 0; i < items.length; i++) {
+        const k = owner[i], w = items[i].count;
+        wsum[k] += w;
+        for (let q = 0; q < 64; q++) sum[k * 64 + q] += items[i].lv[q] * w;
+      }
+      cur = cur.map((lv, k) => {
+        if (!wsum[k]) return lv;
+        const out = new Uint8Array(64);
+        for (let q = 0; q < 64; q++) out[q] = Math.max(0, Math.min(3, Math.round(sum[k * 64 + q] / wsum[k])));
+        return out;
+      });
+    }
+    return cur;
+  }
+
+  function regionToFrame(region, blank, cellPal) {
+    const cells = REG_W * REG_H, map = new Uint8Array(cells), attr = new Uint8Array(cells);
+    const groups = new Map();               // palette -> {key -> tile}
+    const cellKey = new Array(cells).fill(null);
+    let uniqueTotal = 0;
+    for (let ty = 0; ty < REG_H; ty++) for (let tx = 0; tx < REG_W; tx++) {
+      const cell = ty * REG_W + tx;
+      const pal = cellPal ? cellPal[cell] : 0;
+      attr[cell] = pal;
+      const lv = new Uint8Array(64);
+      let any = 0;
+      for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+        const v = region[(ty * 8 + y) * REG_PX_W + tx * 8 + x];
+        lv[y * 8 + x] = v; any |= v;
+      }
+      if (!any) { map[cell] = blank; continue; }
+      let g = groups.get(pal);
+      if (!g) { g = new Map(); groups.set(pal, g); }
+      const key = lv.join(',');
+      let t = g.get(key);
+      if (!t) { t = { lv, count: 0, rep: -1 }; g.set(key, t); uniqueTotal++; }
+      t.count++;
+      cellKey[cell] = t;
+    }
+    const tiles = new Uint8Array(2048);
+    const index = new Map();                 // pattern -> tile slot (shared across palettes)
+    let slots = 0, merged = 0;
+    const slotFor = (lv) => {
+      const key = lv.join(',');
+      let id = index.get(key);
+      if (id === undefined) {
+        if (slots >= 128) return -1;
+        id = slots++; index.set(key, id); tiles.set(encodeTile(lv), id * 16);
+      }
+      return id;
+    };
+    if (uniqueTotal <= 128) {
+      for (const g of groups.values()) for (const t of g.values()) t.rep = slotFor(t.lv);
+    } else {
+      // share the 128 slots between palette groups, by how many patterns each needs
+      const list = [...groups.values()].map((g) => [...g.values()]);
+      const quotas = list.map((items) => Math.max(1, Math.floor(128 * items.length / uniqueTotal)));
+      let left = 128 - quotas.reduce((a, b) => a + b, 0);
+      const order = list.map((items, i) => i).sort((a, b) => list[b].length - list[a].length);
+      for (let i = 0; left > 0; i = (i + 1) % order.length) {
+        const g = order[i];
+        if (quotas[g] < list[g].length) { quotas[g]++; left--; }
+        else if (order.every((k) => quotas[k] >= list[k].length)) break;
+      }
+      list.forEach((items, gi) => {
+        const reps = pickRepresentatives(items, quotas[gi]);
+        const slotIds = reps.map((lv) => slotFor(lv)).filter((v) => v >= 0);
+        for (const t of items) {
+          let best = slotIds[0] === undefined ? 0 : slotIds[0], bd = Infinity;
+          for (let k = 0; k < reps.length; k++) {
+            if (slotIds[k] === undefined || slotIds[k] < 0) continue;
+            const d = tileDist(t.lv, reps[k], bd);
+            if (d < bd) { bd = d; best = slotIds[k]; }
+          }
+          t.rep = best;
+          if (bd > 0) merged++;
+        }
+      });
+    }
+    for (let cell = 0; cell < cells; cell++) {
+      const t = cellKey[cell];
+      if (t) map[cell] = Math.max(0, t.rep);
+    }
+    return { ok: true, tiles, map, attr, count: Math.max(1, slots), merged };
+  }
+
+  function rgb555(c) {
+    const q = (v) => Math.max(0, Math.min(31, Math.round(v * 31 / 255)));
+    return [q(c[0]), q(c[1]), q(c[2])];
+  }
+  const from555 = (c) => [Math.round(c[0] * 255 / 31), Math.round(c[1] * 255 / 31), Math.round(c[2] * 255 / 31)];
+  function palettesToBytes(pals) {
+    const list = pals.list || pals;
+    const out = new Uint8Array(64);
+    for (let p = 0; p < 8; p++) for (let i = 0; i < 4; i++) {
+      const c = rgb555(list[Math.min(p, list.length - 1)][i]);
+      const v = c[0] | (c[1] << 5) | (c[2] << 10);
+      out[(p * 4 + i) * 2] = v & 0xff; out[(p * 4 + i) * 2 + 1] = v >> 8;
+    }
+    return out;
+  }
+
+  function buildRom(stat, frames, opts) {
+    const n = frames.length;
+    if (n < 1 || n > MAX_RECORDS) throw new Error('frame count');
+    const palList = opts.palettes && (opts.palettes.list || opts.palettes);
+    const color = !!(palList && palList.length > 0);
+    const per = perBank(color), size = recordBytes(color);
+    const rom = new Uint8Array(romSize(n, color));
+    const banks = rom.length / 0x4000;
+    rom.set(b64ToBytes(TEMPLATE_B64), 0);
+    const zl = Math.max(1, opts.zoomLevels || 1);
+    const dirs = opts.directions || n;
+    if (n % dirs) throw new Error('frame count per framing');
+    rom[ADDR.count] = dirs;        // directions per framing
+    rom[ADDR.speed] = Math.max(1, Math.min(255, opts.speed | 0));
+    rom[ADDR.auto] = opts.auto ? 1 : 0;
+    rom[ADDR.digit] = stat.digitBase;
+    rom[ADDR.color] = color ? 1 : 0;
+    rom[ADDR.zoom] = zl;
+    const zoomCounts = opts.zoomCounts || [1], bases = opts.bases || [0];
+    for (let z = 0; z < zoomCounts.length && z < 8; z++) {
+      rom[ADDR.zoomTable + z * 2] = zoomCounts[z];
+      rom[ADDR.zoomTable + z * 2 + 1] = bases[z];
+    }
+    frames.forEach((f, i) => {
+      const bank = 1 + Math.floor(i / per), off = (i % per) * size;
+      const addr = 0x4000 + off, t = ADDR.table + i * 4;
+      rom[t] = bank; rom[t + 1] = addr & 0xff; rom[t + 2] = addr >> 8; rom[t + 3] = Math.max(1, f.count);
+      rom.set(f.tiles, bank * 0x4000 + off);
+      rom.set(f.map, bank * 0x4000 + off + MAP_OFS);
+      if (color) rom.set(f.attr, bank * 0x4000 + off + ATTR_OFS);
+    });
+    rom.set(stat.map, ADDR.staticMap);
+    rom.set(stat.shared, ADDR.shared);
+    if (color) {
+      rom.set(palettesToBytes(palList), ADDR.palA);
+      rom.set(palettesToBytes(palList.map((p) => p.map((c) => [255 - c[0], 255 - c[1], 255 - c[2]]))), ADDR.palB);
+    }
+    const title = 'AVATARBOY';
+    for (let i = 0; i < 15; i++) rom[0x134 + i] = i < title.length ? title.charCodeAt(i) : 0;
+    rom[0x143] = color ? 0x80 : 0x00;
+    rom[0x148] = Math.log2(banks) - 1;
+    let x = 0; for (let i = 0x134; i <= 0x14c; i++) x = (x - rom[i] - 1) & 0xff;
+    rom[0x14d] = x;
+    let sum = 0; for (let i = 0; i < rom.length; i++) if (i !== 0x14e && i !== 0x14f) sum += rom[i];
+    rom[0x14e] = (sum >> 8) & 0xff; rom[0x14f] = sum & 0xff;
+    return rom;
+  }
+
+  // What the ROM shows for frame i: pixel levels plus the palette used by each pixel.
+  function composeScreen(stat, frame, i) {
+    const lev = new Uint8Array(160 * 144), pal = new Uint8Array(160 * 144), cells = stat.map.slice();
+    const cellPal = new Uint8Array(20 * 18);
+    if (frame) for (let ty = 0; ty < REG_H; ty++) for (let tx = 0; tx < REG_W; tx++) {
+      cells[(ty + 1) * 20 + tx + 1] = frame.map[ty * REG_W + tx];
+      if (frame.attr) cellPal[(ty + 1) * 20 + tx + 1] = frame.attr[ty * REG_W + tx];
+    }
+    const k = i + 1;
+    cells[CNT_ROW * 20 + CNT_COL] = stat.digitBase + Math.floor(k / 10);
+    cells[CNT_ROW * 20 + CNT_COL + 1] = stat.digitBase + (k % 10);
+    for (let cy = 0; cy < 18; cy++) for (let cx = 0; cx < 20; cx++) {
+      const t = cells[cy * 20 + cx], p = cellPal[cy * 20 + cx];
+      if (t >= 128) decodeTile(stat.shared, (t - 128) * 16, lev, 160, cx * 8, cy * 8);
+      else if (frame) decodeTile(frame.tiles, t * 16, lev, 160, cx * 8, cy * 8);
+      if (p) for (let y = 0; y < 8; y++) pal.fill(p, (cy * 8 + y) * 160 + cx * 8, (cy * 8 + y) * 160 + cx * 8 + 8);
+    }
+    return { lev, pal };
+  }
+
+  const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  const lumOf = (r, g, b) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  // Crop of one RGBA render -> tw x th coverage mask, luminance and colour.
+  function downsample(view, RS, crop, tw, th) {
+    const mask = new Uint8Array(tw * th), lum = new Float32Array(tw * th), rgb = new Float32Array(tw * th * 3);
+    const k = Math.max(1, Math.min(6, Math.ceil(crop.w / tw)));
+    for (let y = 0; y < th; y++) for (let x = 0; x < tw; x++) {
+      let sa = 0, sr = 0, sg = 0, sb = 0;
+      for (let j = 0; j < k; j++) for (let i = 0; i < k; i++) {
+        const sx = Math.min(RS - 1, Math.floor(crop.x + (x + (i + 0.5) / k) * crop.w / tw));
+        const sy = Math.min(RS - 1, Math.floor(crop.y + (y + (j + 0.5) / k) * crop.h / th));
+        const p = (sy * RS + sx) * 4, a = view[p + 3] / 255;
+        sa += a; sr += view[p] * a; sg += view[p + 1] * a; sb += view[p + 2] * a;
+      }
+      const o = y * tw + x;
+      if (sa / (k * k) >= 0.5) {
+        mask[o] = 1;
+        const r = sr / sa, g = sg / sa, b = sb / sa;
+        rgb[o * 3] = r; rgb[o * 3 + 1] = g; rgb[o * 3 + 2] = b;
+        lum[o] = lumOf(r, g, b);
+      }
+    }
+    return { mask, lum, rgb, tw, th };
+  }
+
+  // Luminance window used for the 4 shades; auto mode stretches the model's own range.
+  function levelRange(list, auto) {
+    if (!auto) return { lo: 0, hi: 1 };
+    const hist = new Float64Array(256); let total = 0;
+    for (const ds of list) for (let i = 0; i < ds.mask.length; i++) if (ds.mask[i]) {
+      hist[Math.max(0, Math.min(255, Math.round(ds.lum[i] * 255)))]++; total++;
+    }
+    if (!total) return { lo: 0, hi: 1 };
+    const at = (frac) => { let acc = 0; for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= total * frac) return v / 255; } return 1; };
+    let lo = at(0.02), hi = at(0.98);
+    if (hi - lo < 0.06) { const c = (lo + hi) / 2; lo = Math.max(0, c - 0.03); hi = Math.min(1, c + 0.03); }
+    return { lo, hi };
+  }
+  const adjust = (L, s, rng) => {
+    const n = rng.hi > rng.lo ? (L - rng.lo) / (rng.hi - rng.lo) : L;
+    return Math.max(0, Math.min(1, (n - 0.5) * s.contrast + 0.5 + s.brightness));
+  };
+
+  // Lone pixels cost a whole tile each and read as dirt on screen; fold them into their neighbours.
+  function despeckle(lv, w, h, inside) {
+    const out = lv.slice(), counts = new Int32Array(4);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (inside && !inside(x, y, i)) continue;
+      counts.fill(0);
+      let same = 0, total = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const j = ny * w + nx;
+        if (inside && !inside(nx, ny, j)) continue;
+        total++; counts[lv[j]]++;
+        if (lv[j] === lv[i]) same++;
+      }
+      if (total >= 5 && same <= 1) {
+        let best = 0;
+        for (let v = 1; v < 4; v++) if (counts[v] > counts[best]) best = v;
+        out[i] = best;
+      }
+    }
+    return out;
+  }
+
+  function quantizeMono(ds, s, rng) {
+    const { tw, th } = ds, out = new Uint8Array(tw * th), val = new Float32Array(tw * th);
+    for (let i = 0; i < tw * th; i++) if (ds.mask[i]) val[i] = Math.max(0, Math.min(3, (1 - adjust(ds.lum[i], s, rng)) * 3));
+    for (let y = 0; y < th; y++) for (let x = 0; x < tw; x++) {
+      const i = y * tw + x; if (!ds.mask[i]) continue;
+      const v = val[i];
+      let q = s.dither === 'bayer' ? Math.round(v + ((BAYER4[(y & 3) * 4 + (x & 3)] + 0.5) / 16 - 0.5) * 0.9) : Math.round(v);
+      q = Math.max(0, Math.min(3, q)); out[i] = q;
+      if (s.dither === 'fs') {
+        const e = v - q;
+        const spread = (dx, dy, w) => {
+          const nx = x + dx, ny = y + dy;
+          if (nx < 0 || nx >= tw || ny >= th) return;
+          const j = ny * tw + nx; if (ds.mask[j]) val[j] += e * w;
+        };
+        spread(1, 0, 7 / 16); spread(-1, 1, 3 / 16); spread(0, 1, 5 / 16); spread(1, 1, 1 / 16);
+      }
+    }
+    return out;
+  }
+
+  // Shared geometry: where the figure and its shadow sit inside the 144x128 region.
+  function layout(ds, s, crop, axis) {
+    const { tw, th } = ds;
+    const xOff = Math.floor((REG_PX_W - tw) / 2);
+    const yOff = s.clip ? Math.round((REG_PX_H - th) / 2) : REG_PX_H - th - 1 - (s.shadow ? 1 : 0);
+    const cx = xOff + (axis.x - crop.x) * tw / crop.w, cy = yOff + (axis.y - crop.y) * th / crop.h;
+    const rx = Math.max(5, th * 0.15), ry = Math.max(1.6, rx * 0.26);
+    return { xOff, yOff, cx, cy, rx, ry };
+  }
+  function eachShadow(L, s, fn) {
+    if (!s.shadow) return;
+    for (let y = Math.floor(L.cy - L.ry); y <= Math.ceil(L.cy + L.ry); y++)
+      for (let x = Math.floor(L.cx - L.rx); x <= Math.ceil(L.cx + L.rx); x++) {
+        const dx = (x + 0.5 - L.cx) / L.rx, dy = (y + 0.5 - L.cy) / L.ry;
+        if (dx * dx + dy * dy <= 1) fn(x, y);
+      }
+  }
+  function eachPixel(ds, L, s, onFill, onEdge) {
+    const { tw, th } = ds;
+    const m = (x, y) => x >= 0 && y >= 0 && x < tw && y < th && ds.mask[y * tw + x] === 1;
+    // in a cropped view the figure runs off the edge: treat outside as more of the same
+    const n = s.clip
+      ? (x, y) => m(Math.max(0, Math.min(tw - 1, x)), Math.max(0, Math.min(th - 1, y)))
+      : m;
+    const from = s.clip ? 0 : -1, toX = s.clip ? tw - 1 : tw, toY = s.clip ? th - 1 : th;
+    for (let y = from; y <= toY; y++) for (let x = from; x <= toX; x++) {
+      const inside = m(x, y);
+      const edge = !n(x - 1, y) || !n(x + 1, y) || !n(x, y - 1) || !n(x, y + 1);
+      const near = n(x - 1, y) || n(x + 1, y) || n(x, y - 1) || n(x, y + 1);
+      if (inside) {
+        if (s.outline === 'inner' && edge) onEdge(L.xOff + x, L.yOff + y);
+        else onFill(L.xOff + x, L.yOff + y, y * tw + x);
+      } else if (s.outline === 'outer' && near) onEdge(L.xOff + x, L.yOff + y);
+    }
+  }
+  const inRegion = (x, y) => x >= 0 && y >= 0 && x < REG_PX_W && y < REG_PX_H;
+
+  function makeRegionMono(ds, s, crop, axis, rng) {
+    let q = quantizeMono(ds, s, rng);
+    const passes = s.smooth === undefined ? 1 : s.smooth;
+    for (let k = 0; k < passes; k++) q = despeckle(q, ds.tw, ds.th, (x, y, i) => ds.mask[i] === 1);
+    const region = new Uint8Array(REG_PX_W * REG_PX_H), L = layout(ds, s, crop, axis);
+    const set = (x, y, v) => { if (inRegion(x, y)) region[y * REG_PX_W + x] = v; };
+    eachShadow(L, s, (x, y) => set(x, y, 1));
+    eachPixel(ds, L, s, (x, y, i) => set(x, y, q[i]), (x, y) => set(x, y, 3));
+    return region;
+  }
+
+  // Colour region: rgb per pixel plus a kind map (0 background, 1 fill, 2 outline).
+  function makeRegionColor(ds, s, crop, axis, rng) {
+    const N = REG_PX_W * REG_PX_H, rgb = new Float32Array(N * 3), kind = new Uint8Array(N);
+    const L = layout(ds, s, crop, axis);
+    const bg = s.bgColor, line = s.lineColor;
+    const shade = [bg[0] * 0.7 + line[0] * 0.3, bg[1] * 0.7 + line[1] * 0.3, bg[2] * 0.7 + line[2] * 0.3];
+    const put = (x, y, c, k) => {
+      if (!inRegion(x, y)) return;
+      const o = y * REG_PX_W + x; kind[o] = k;
+      rgb[o * 3] = c[0]; rgb[o * 3 + 1] = c[1]; rgb[o * 3 + 2] = c[2];
+    };
+    eachShadow(L, s, (x, y) => put(x, y, shade, 1));
+    const c = [0, 0, 0];
+    eachPixel(ds, L, s, (x, y, i) => {
+      const r = ds.rgb[i * 3], g = ds.rgb[i * 3 + 1], b = ds.rgb[i * 3 + 2];
+      const Lr = Math.max(ds.lum[i], 0.004), f = Math.min(4, adjust(ds.lum[i], s, rng) / Lr);
+      c[0] = Math.min(255, r * f); c[1] = Math.min(255, g * f); c[2] = Math.min(255, b * f);
+      put(x, y, c, 1);
+    }, (x, y) => put(x, y, line, 2));
+    return { rgb, kind };
+  }
+
+  // ---------- Game Boy Color palettes ----------
+  // Tiles that touch the background or the outline need those exact colours, so they get
+  // palettes shaped [bg, free, free, line]. Tiles fully inside the figure get four free
+  // colours, which is what keeps large flat areas from breaking into blocks.
+  function kmeansColors(px, k, weights) {
+    const n = px.length / 3;
+    if (!n) return [];
+    const lum = new Float32Array(n);
+    for (let i = 0; i < n; i++) lum[i] = lumOf(px[i * 3], px[i * 3 + 1], px[i * 3 + 2]);
+    const order = Array.from({ length: n }, (_, i) => i).sort((a, b) => lum[a] - lum[b]);
+    const cent = [];
+    for (let c = 0; c < k; c++) {
+      const i = order[Math.min(n - 1, Math.floor((c + 0.5) * n / k))];
+      cent.push([px[i * 3], px[i * 3 + 1], px[i * 3 + 2]]);
+    }
+    const assign = new Int32Array(n);
+    for (let iter = 0; iter < 8; iter++) {
+      for (let i = 0; i < n; i++) {
+        let best = 0, bd = Infinity;
+        for (let c = 0; c < k; c++) {
+          const dr = px[i * 3] - cent[c][0], dg = px[i * 3 + 1] - cent[c][1], db = px[i * 3 + 2] - cent[c][2];
+          const d = dr * dr + dg * dg + db * db;
+          if (d < bd) { bd = d; best = c; }
+        }
+        assign[i] = best;
+      }
+      const sum = Array.from({ length: k }, () => [0, 0, 0]), w = new Float64Array(k);
+      for (let i = 0; i < n; i++) {
+        const c = assign[i], q = weights ? weights[i] : 1;
+        w[c] += q; sum[c][0] += px[i * 3] * q; sum[c][1] += px[i * 3 + 1] * q; sum[c][2] += px[i * 3 + 2] * q;
+      }
+      for (let c = 0; c < k; c++) if (w[c] > 0) cent[c] = [sum[c][0] / w[c], sum[c][1] / w[c], sum[c][2] / w[c]];
+    }
+    cent.sort((a, b) => lumOf(b[0], b[1], b[2]) - lumOf(a[0], a[1], a[2]));
+    return cent;
+  }
+  // group tiles by how they are shaded, so each group can get its own palette
+  function groupTiles(tiles, k) {
+    if (k <= 1 || tiles.length <= k) return tiles.map(() => 0);
+    const dim = 9, vec = tiles.map((t) => t.desc);
+    const cent = [];
+    const seedOrder = tiles.map((t, i) => i).sort((a, b) => tiles[b].weight - tiles[a].weight);
+    cent.push(vec[seedOrder[0]].slice());
+    const near = new Float64Array(tiles.length).fill(Infinity);
+    while (cent.length < k) {
+      const last = cent[cent.length - 1];
+      let pick = -1, bestScore = -1;
+      for (let i = 0; i < tiles.length; i++) {
+        let d = 0;
+        for (let q = 0; q < dim; q++) { const f = vec[i][q] - last[q]; d += f * f; }
+        if (d < near[i]) near[i] = d;
+        const score = near[i] * Math.sqrt(tiles[i].weight);
+        if (score > bestScore) { bestScore = score; pick = i; }
+      }
+      if (pick < 0) break;
+      cent.push(vec[pick].slice());
+    }
+    const assign = new Int32Array(tiles.length);
+    for (let iter = 0; iter < 6; iter++) {
+      for (let i = 0; i < tiles.length; i++) {
+        let best = 0, bd = Infinity;
+        for (let c = 0; c < cent.length; c++) {
+          let d = 0;
+          for (let q = 0; q < dim && d < bd; q++) { const f = vec[i][q] - cent[c][q]; d += f * f; }
+          if (d < bd) { bd = d; best = c; }
+        }
+        assign[i] = best;
+      }
+      const sum = Array.from({ length: cent.length }, () => new Float64Array(dim)), w = new Float64Array(cent.length);
+      for (let i = 0; i < tiles.length; i++) {
+        const c = assign[i], q = tiles[i].weight; w[c] += q;
+        for (let d = 0; d < dim; d++) sum[c][d] += vec[i][d] * q;
+      }
+      for (let c = 0; c < cent.length; c++) if (w[c] > 0) for (let d = 0; d < dim; d++) cent[c][d] = sum[c][d] / w[c];
+    }
+    return assign;
+  }
+  function tileStats(R, ty, tx) {
+    const px = [];
+    let hasBg = false, hasLine = false;
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+      const o = (ty * 8 + y) * REG_PX_W + tx * 8 + x, k = R.kind[o];
+      if (k === 0) { hasBg = true; continue; }
+      if (k === 2) { hasLine = true; continue; }
+      px.push(R.rgb[o * 3], R.rgb[o * 3 + 1], R.rgb[o * 3 + 2]);
+    }
+    if (!px.length) return null;
+    const n = px.length / 3;
+    const lum = [];
+    for (let i = 0; i < n; i++) lum.push([lumOf(px[i * 3], px[i * 3 + 1], px[i * 3 + 2]), i]);
+    lum.sort((a, b) => a[0] - b[0]);
+    const half = Math.max(1, Math.floor(n / 2));
+    const mean = [0, 0, 0], dark = [0, 0, 0], light = [0, 0, 0];
+    for (let i = 0; i < n; i++) {
+      const j = lum[i][1] * 3, t = i < half ? dark : light, w = i < half ? half : n - half;
+      t[0] += px[j] / w; t[1] += px[j + 1] / w; t[2] += px[j + 2] / w;
+      mean[0] += px[j] / n; mean[1] += px[j + 1] / n; mean[2] += px[j + 2] / n;
+    }
+    return { px: Float32Array.from(px), weight: n, edge: hasBg || hasLine,
+      desc: [mean[0], mean[1], mean[2], dark[0], dark[1], dark[2], light[0], light[1], light[2]] };
+  }
+  function buildPalettes(regions, s) {
+    const bg = from555(rgb555(s.bgColor)), line = from555(rgb555(s.lineColor));
+    const edge = [], inner = [];
+    for (const R of regions) for (let ty = 0; ty < REG_H; ty++) for (let tx = 0; tx < REG_W; tx++) {
+      const t = tileStats(R, ty, tx);
+      if (t) (t.edge ? edge : inner).push(t);
+    }
+    const total = edge.length + inner.length;
+    if (!total) { const flat = Array.from({ length: 8 }, () => [bg, bg, line, line]); flat.edgeCount = 8; return flat; }
+    let E = Math.round(8 * edge.length / total);
+    E = Math.max(1, Math.min(inner.length ? 4 : 8, E));
+    const I = 8 - E;
+    const collect = (tiles, ids, id) => {
+      const px = [];
+      for (let i = 0; i < tiles.length; i++) if (ids[i] === id) {
+        const a = tiles[i].px;
+        for (let q = 0; q < a.length; q += 3) { px.push(a[q], a[q + 1], a[q + 2]); }
+      }
+      return Float32Array.from(px);
+    };
+    const list = [];
+    const eIds = groupTiles(edge, E);
+    for (let g = 0; g < E; g++) {
+      const px = edge.length ? collect(edge, eIds, g) : new Float32Array(0);
+      const cols = kmeansColors(px, 2) || [];
+      const mid = [cols[0] || bg, cols[1] || line].map((c) => from555(rgb555(c)));
+      list.push([bg, mid[0], mid[1], line]);
+    }
+    if (I > 0) {
+      const iIds = groupTiles(inner, I);
+      for (let g = 0; g < I; g++) {
+        const px = collect(inner, iIds, g);
+        const cols = kmeansColors(px, 4);
+        const four = [];
+        for (let q = 0; q < 4; q++) four.push(from555(rgb555(cols[q] || cols[cols.length - 1] || bg)));
+        list.push(four);
+      }
+    }
+    while (list.length < 8) list.push(list[list.length - 1]);
+    const out = list.slice(0, 8);
+    out.edgeCount = E;            // palettes 0..E-1 carry the background and outline colours
+    return out;
+  }
+
+  // Colour region -> level image + per-cell palette choice.
+  function paintWithPalettes(R, pals, s) {
+    const list = pals.list || pals, edgeCount = pals.edgeCount || list.length;
+    const region = new Uint8Array(REG_PX_W * REG_PX_H), cellPal = new Uint8Array(REG_W * REG_H);
+    const err = s.dither === 'fs' ? new Float32Array(REG_PX_W * REG_PX_H * 3) : null;
+    for (let ty = 0; ty < REG_H; ty++) for (let tx = 0; tx < REG_W; tx++) {
+      const px = [];
+      let hasBg = false, hasLine = false;
+      for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+        const o = (ty * 8 + y) * REG_PX_W + tx * 8 + x, k = R.kind[o];
+        if (k === 0) hasBg = true;
+        else if (k === 2) hasLine = true;
+        else px.push(o);
+      }
+      const limit = (hasBg || hasLine) ? edgeCount : list.length;
+      let best = 0;
+      if (px.length) {
+        let bd = Infinity;
+        for (let p = 0; p < limit; p++) {
+          let d = 0;
+          for (const o of px) {
+            let m = Infinity;
+            for (let i = 0; i < 4; i++) {
+              const c = list[p][i];
+              const dr = R.rgb[o * 3] - c[0], dg = R.rgb[o * 3 + 1] - c[1], db = R.rgb[o * 3 + 2] - c[2];
+              const e = dr * dr + dg * dg + db * db;
+              if (e < m) m = e;
+            }
+            d += m;
+            if (d >= bd) break;
+          }
+          if (d < bd) { bd = d; best = p; }
+        }
+      }
+      cellPal[ty * REG_W + tx] = best;
+      const pal = list[best];
+      const tile = new Uint8Array(64), fill = new Uint8Array(64);
+      for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+        const gx = tx * 8 + x, gy = ty * 8 + y, o = gy * REG_PX_W + gx;
+        if (R.kind[o] === 0) { region[o] = 0; tile[y * 8 + x] = 0; continue; }
+        if (R.kind[o] === 2) { region[o] = 3; tile[y * 8 + x] = 3; continue; }
+        const want = [R.rgb[o * 3], R.rgb[o * 3 + 1], R.rgb[o * 3 + 2]];
+        if (err) for (let j = 0; j < 3; j++) want[j] = Math.max(0, Math.min(255, want[j] + err[o * 3 + j]));
+        let bi = 0, bd = Infinity;
+        for (let i = 0; i < 4; i++) {
+          const c = pal[i], dr = want[0] - c[0], dg = want[1] - c[1], db = want[2] - c[2];
+          const d = dr * dr + dg * dg + db * db;
+          if (d < bd) { bd = d; bi = i; }
+        }
+        tile[y * 8 + x] = bi; fill[y * 8 + x] = 1;
+        region[o] = bi;
+        if (err) {
+          const c = pal[bi];
+          const e = [want[0] - c[0], want[1] - c[1], want[2] - c[2]];
+          const spread = (dx, dy, w) => {
+            const nx = gx + dx, ny = gy + dy;
+            if (nx < tx * 8 || nx >= tx * 8 + 8 || ny >= ty * 8 + 8 || ny < 0) return;
+            const j = ny * REG_PX_W + nx;
+            if (R.kind[j] !== 1) return;
+            for (let q = 0; q < 3; q++) err[j * 3 + q] += e[q] * w;
+          };
+          spread(1, 0, 7 / 16); spread(-1, 1, 3 / 16); spread(0, 1, 5 / 16); spread(1, 1, 1 / 16);
+        }
+      }
+      const passes = s.smooth === undefined ? 1 : s.smooth;
+      if (s.dither !== 'fs') {
+        let cleaned = tile;
+        for (let k = 0; k < passes; k++) cleaned = despeckle(cleaned, 8, 8, (x, y, i) => fill[i] === 1);
+        for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++)
+          if (fill[y * 8 + x]) region[(ty * 8 + y) * REG_PX_W + tx * 8 + x] = cleaned[y * 8 + x];
+      }
+    }
+    return { region, cellPal };
+  }
+
+  function unionCrop(views, RS) {
+    let x0 = RS, y0 = RS, x1 = -1, y1 = -1;
+    for (const v of views) for (let y = 0; y < RS; y++) {
+      const row = y * RS * 4;
+      for (let x = 0; x < RS; x++) if (v[row + x * 4 + 3] > 127) {
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+    }
+    if (x1 < 0) return null;
+    return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+  }
+
+  // Views -> frames that fit the tile budget, shrinking the figure if needed.
+  // A "framing" is one zoom step plus one vertical position; the ROM stores them all.
+  function topOpaque(view, RS, box, cx, halfWin) {
+    const x0 = Math.max(0, Math.floor(cx - halfWin)), x1 = Math.min(RS - 1, Math.ceil(cx + halfWin));
+    for (let y = Math.max(0, Math.floor(box.y)); y < Math.min(RS, box.y + box.h); y++) {
+      const row = y * RS * 4;
+      for (let x = x0; x <= x1; x++) if (view[row + x * 4 + 3] > 127) return y;
+    }
+    return box.y;
+  }
+  function topBandCenter(view, RS, box) {
+    let top = -1;
+    for (let y = Math.max(0, Math.floor(box.y)); y < Math.min(RS, box.y + box.h) && top < 0; y++) {
+      const row = y * RS * 4;
+      for (let x = Math.max(0, Math.floor(box.x)); x < Math.min(RS, box.x + box.w); x++)
+        if (view[row + x * 4 + 3] > 127) { top = y; break; }
+    }
+    if (top < 0) return { cx: box.x + box.w / 2, top: box.y };
+    let sum = 0, n = 0;
+    const yEnd = Math.min(RS, top + Math.max(4, box.h * 0.12));
+    for (let y = top; y < yEnd; y++) {
+      const row = y * RS * 4;
+      for (let x = Math.max(0, Math.floor(box.x)); x < Math.min(RS, box.x + box.w); x++)
+        if (view[row + x * 4 + 3] > 127) { sum += x; n++; }
+    }
+    return { cx: n ? sum / n : box.x + box.w / 2, top };
+  }
+
+  // Head size and per-frame horizontal centre, used by every zoomed framing.
+  function headInfo(views, RS, crop, anchors) {
+    const per = views.map((v, i) => {
+      const a = anchors && anchors[i] ? anchors[i] : null;
+      const band = a ? null : topBandCenter(v, RS, crop);
+      const cx = a ? a.x : band.cx;
+      const top = a ? topOpaque(v, RS, crop, cx, crop.w * 0.3) : band.top;
+      const bottom = a ? a.y : top + crop.h * 0.17;
+      return { cx, span: Math.max(4, bottom - top) };
+    });
+    const spans = per.map((o) => o.span).slice().sort((x, y) => x - y);
+    return { per, span: spans[Math.floor(spans.length / 2)] };
+  }
+
+  function planFramings(views, RS, crop, anchors, zoomSteps, panSteps) {
+    const info = headInfo(views, RS, crop, anchors);
+    const faceFrac = Math.max(0.1, Math.min(1, info.span * 1.3 / crop.h));
+    const zoomCount = Math.max(1, Math.min(8, zoomSteps));
+    const list = [], zoomCounts = [], bases = [];
+    for (let z = 0; z < zoomCount; z++) {
+      // from the whole figure down to the face, in even steps
+      const f = zoomCount > 1 ? Math.pow(faceFrac, z / (zoomCount - 1)) : 1;
+      // only offer as many vertical positions as the window actually needs
+      const fit = Math.max(1, Math.round((1 - f) / (f * 0.5)) + 1);
+      const pc = (z === 0 || f >= 0.98) ? 1 : Math.max(1, Math.min(panSteps, fit));
+      zoomCounts.push(pc); bases.push(list.length);
+      for (let p = 0; p < pc; p++) {
+        const h = Math.min(crop.h, f * crop.h);
+        const top = crop.y + (crop.h - h) * (pc > 1 ? p / (pc - 1) : 0);
+        const w = Math.min(RS, h * (REG_PX_W - 2) / (REG_PX_H - 2));
+        const crops = views.map((v, i) => {
+          if (z === 0) return crop;
+          let x = info.per[i].cx - w / 2;
+          x = Math.max(0, Math.min(RS - w, x));
+          const y = Math.max(0, Math.min(RS - h, top));
+          return { x, y, w, h };
+        });
+        list.push({ z, p, crops, shadow: z === 0, clip: z > 0, index: list.length });
+      }
+    }
+    return { list, zoomCounts, bases, faceFrac };
+  }
+
+  // Build one framing: N direction frames plus the layout used to draw them.
+  function buildFraming(views, RS, framing, axis, s, blank, palettes) {
+    const o = Object.assign({}, s, { shadow: s.shadow && framing.shadow, clip: !!framing.clip });
+    const c0 = framing.crops[0];
+    const scale = Math.min((REG_PX_W - 2) / c0.w, (REG_PX_H - 2 - (o.shadow ? 1 : 0)) / c0.h) * s.size;
+    const tw = Math.max(1, Math.round(c0.w * scale)), th = Math.max(1, Math.round(c0.h * scale));
+    const list = views.map((v, i) => downsample(v, RS, framing.crops[i], tw, th));
+    const rng = levelRange(list, s.autoLevels);
+    let pal = palettes || null, regions = null;
+    if (s.color) {
+      regions = list.map((ds) => makeRegionColor(ds, o, c0, axis, rng));
+      if (!pal) pal = buildPalettes(regions, s);
+    }
+    const frames = []; let merged = 0;
+    for (let i = 0; i < list.length; i++) {
+      const f = s.color
+        ? (() => { const paint = paintWithPalettes(regions[i], pal, o); return regionToFrame(paint.region, blank, paint.cellPal); })()
+        : regionToFrame(makeRegionMono(list[i], o, c0, axis, rng), blank);
+      merged = Math.max(merged, f.merged || 0);
+      frames.push(f);
+    }
+    const meta = { crops: framing.crops, tw, th,
+      xOff: Math.floor((REG_PX_W - tw) / 2),
+      yOff: o.clip ? Math.round((REG_PX_H - th) / 2) : REG_PX_H - th - 1 - (o.shadow ? 1 : 0) };
+    return { frames, meta, palettes: pal, shrink: 1, merged };
+  }
+
+  // ---------- GIF ----------
+  function gifEncode(screens, w, h, colors, delayCs, scale) {
+    const W = w * scale, H = h * scale, bytes = [];
+    let bits = 2; while ((1 << bits) < colors.length) bits++;
+    const u16 = (v) => bytes.push(v & 0xff, (v >> 8) & 0xff);
+    const str = (s) => { for (const c of s) bytes.push(c.charCodeAt(0)); };
+    str('GIF89a'); u16(W); u16(H); bytes.push(0xf0 | (bits - 1), 0, 0);
+    for (let i = 0; i < (1 << bits); i++) { const c = colors[i] || [0, 0, 0]; bytes.push(c[0], c[1], c[2]); }
+    bytes.push(0x21, 0xff, 11); str('NETSCAPE2.0'); bytes.push(3, 1, 0, 0, 0);
+    for (const scr of screens) {
+      bytes.push(0x21, 0xf9, 4, 0x04); u16(delayCs); bytes.push(0, 0);
+      bytes.push(0x2c); u16(0); u16(0); u16(W); u16(H); bytes.push(0);
+      const idx = new Uint8Array(W * H);
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) idx[y * W + x] = scr[Math.floor(y / scale) * w + Math.floor(x / scale)];
+      const data = lzw(idx, bits);
+      bytes.push(bits);
+      for (let i = 0; i < data.length; i += 255) {
+        const n = Math.min(255, data.length - i); bytes.push(n);
+        for (let j = 0; j < n; j++) bytes.push(data[i + j]);
+      }
+      bytes.push(0);
+    }
+    bytes.push(0x3b);
+    return new Uint8Array(bytes);
+  }
+  function lzw(idx, minSize) {
+    const clear = 1 << minSize, eoi = clear + 1, out = [];
+    let size = minSize + 1, next = eoi + 1, cur = 0, bits = 0, dict = new Map();
+    const emit = (code) => { cur |= code << bits; bits += size; while (bits >= 8) { out.push(cur & 0xff); cur >>>= 8; bits -= 8; } };
+    emit(clear);
+    let prefix = idx[0];
+    for (let i = 1; i < idx.length; i++) {
+      const k = idx[i], key = prefix * 256 + k, hit = dict.get(key);
+      if (hit !== undefined) { prefix = hit; continue; }
+      emit(prefix);
+      if (next === 4096) { emit(clear); dict = new Map(); size = minSize + 1; next = eoi + 1; }
+      else { if (next >= (1 << size)) size++; dict.set(key, next++); }
+      prefix = k;
+    }
+    emit(prefix); emit(eoi);
+    if (bits > 0) out.push(cur & 0xff);
+    return out;
+  }
+
+  // ---------- ZIP (stored) ----------
+  const CRC = (() => { const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return t; })();
+  function crc32(d) { let c = 0xffffffff; for (let i = 0; i < d.length; i++) c = CRC[(c ^ d[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+  function utf8(s) { return typeof TextEncoder !== 'undefined' ? new TextEncoder().encode(s) : new Uint8Array(Buffer.from(s, 'utf8')); }
+  async function deflateRaw(data) {
+    if (typeof CompressionStream === 'undefined') return null;
+    try {
+      const cs = new CompressionStream('deflate-raw');
+      const buf = await new Response(new Blob([data]).stream().pipeThrough(cs)).arrayBuffer();
+      return new Uint8Array(buf);
+    } catch (e) { return null; }
+  }
+  async function zip(files) {
+    const parts = [], central = []; let offset = 0;
+    const le = (n, v) => { const a = []; for (let i = 0; i < n; i++) a.push((v >>> (8 * i)) & 0xff); return a; };
+    for (const f of files) {
+      const name = utf8(f.name), data = f.data, crc = crc32(data);
+      const packed = await deflateRaw(data);
+      const use = packed && packed.length < data.length ? packed : data;
+      const method = use === data ? 0 : 8;
+      const head = [...le(4, 0x04034b50), ...le(2, 20), ...le(2, 0x0800), ...le(2, method), ...le(2, 0), ...le(2, 0x21),
+        ...le(4, crc), ...le(4, use.length), ...le(4, data.length), ...le(2, name.length), ...le(2, 0)];
+      parts.push(new Uint8Array(head), name, use);
+      central.push(new Uint8Array([...le(4, 0x02014b50), ...le(2, 20), ...le(2, 20), ...le(2, 0x0800), ...le(2, method), ...le(2, 0), ...le(2, 0x21),
+        ...le(4, crc), ...le(4, use.length), ...le(4, data.length), ...le(2, name.length), ...le(2, 0), ...le(2, 0), ...le(2, 0), ...le(2, 0),
+        ...le(4, 0), ...le(4, offset)]), name);
+      offset += head.length + name.length + use.length;
+    }
+    const cdSize = central.reduce((a, p) => a + p.length, 0);
+    const end = new Uint8Array([...le(4, 0x06054b50), ...le(2, 0), ...le(2, 0), ...le(2, files.length), ...le(2, files.length),
+      ...le(4, cdSize), ...le(4, offset), ...le(2, 0)]);
+    const all = [...parts, ...central, end], total = all.reduce((a, p) => a + p.length, 0);
+    const out = new Uint8Array(total); let p = 0; for (const a of all) { out.set(a, p); p += a.length; }
+    return out;
+  }
+
+  const GB = { REG_PX_W, REG_PX_H, MAX_NAME, sanitizeName, buildStatic, regionToFrame, buildRom, composeScreen,
+    unionCrop, planFramings, buildFraming, gifEncode, zip, utf8, glyph, rgb555, from555, romSize, MAX_RECORDS };
+  if (typeof module !== 'undefined' && module.exports) module.exports = GB; else root.GB = GB;
+})(typeof self !== 'undefined' ? self : this);
+</script>
+<script>
+(function () {
+  'use strict';
+  const RS = 512;
+  const $ = (id) => document.getElementById(id);
+  const PALETTES = {
+    green: [[155, 188, 15], [139, 172, 15], [48, 98, 48], [15, 56, 15]],
+    pocket: [[222, 222, 214], [158, 158, 150], [92, 92, 88], [30, 30, 30]],
+    pale: [[240, 248, 232], [184, 210, 170], [104, 140, 112], [40, 64, 58]],
+  };
+  const WHITE_PX = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+  const MODEL_EXT = /\.(fbx|vrm|glb|gltf)$/i, IMAGE_EXT = /\.(png|jpe?g|webp|tga|bmp|gif|psd)$/i;
+
+  const BGS = {
+    white: { bgColor: [242, 244, 234], lineColor: [26, 26, 40] },
+    sky: { bgColor: [206, 230, 246], lineColor: [24, 34, 60] },
+    sakura: { bgColor: [248, 222, 230], lineColor: [56, 24, 40] },
+    night: { bgColor: [26, 26, 44], lineColor: [232, 238, 248] },
+  };
+  const S = {
+    startDeg: 0, elev: 8, arms: 0, size: 1, brightness: 0, contrast: 1.1, shading: 0.6,
+    dither: 'none', outline: 'outer', shadow: true, name: '', speed: 8, autoStart: true, palette: 'green',
+    color: true, autoLevels: true, bg: 'white', zoomSteps: 5, panSteps: 10, count: 32, smooth: 1, cutout: true,
+  };
+  const settings = () => Object.assign({}, S, BGS[S.bg], { anchors: st.anchors });
+  const st = {
+    files: new Map(), modelFile: null, three: null, wrap: null, root: null, meshes: [],
+    arms: [], H: 1, views: null, crop: null, axis: null, stat: null, frames: null,
+    frame: 0, auto: false, inverted: false, placeholder: null, loadToken: 0,
+    palettes: null, texUrls: new Map(), isGltf: false, levels: null, zoom: 0, romSize: 0,
+    headBone: null, anchors: null, parts: [], shapes: [], psdUrls: new Map(), psdFailed: new Set(), fileUrls: new Map(),
+    meta: null, erased: [], eraser: false, plan: null, cache: new Map(), view: { z: 0, p: 0 }, selectHeld: false,
+  };
+
+  // ---------- status + screen ----------
+  function setStatus(msg, warn, keep) {
+    const el = $('status'); el.textContent = msg; el.classList.toggle('warn', !!warn);
+    if (keep !== false) st.lastStatus = { msg, warn };
+  }
+  const scr = $('screen'), sctx = scr.getContext('2d'), img = sctx.createImageData(160, 144);
+  function paint(sc) {
+    const d = img.data, useColor = S.color && st.palettes;
+    const mono = PALETTES[S.palette];
+    for (let i = 0; i < sc.lev.length; i++) {
+      let c;
+      if (useColor) {
+        c = st.palettes[sc.pal[i]][sc.lev[i]];
+        if (st.inverted) c = [255 - c[0], 255 - c[1], 255 - c[2]];
+      } else c = mono[st.inverted ? 3 - sc.lev[i] : sc.lev[i]];
+      d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
+    }
+    sctx.putImageData(img, 0, 0);
+  }
+  function textFrame(lines, stat) {
+    const region = new Uint8Array(GB.REG_PX_W * GB.REG_PX_H);
+    const top = Math.floor((GB.REG_PX_H - lines.length * 12) / 2);
+    lines.forEach((line, li) => {
+      const x0 = Math.floor((GB.REG_PX_W - line.length * 8) / 2);
+      for (let c = 0; c < line.length; c++) {
+        const g = GB.glyph(line[c]);
+        for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++)
+          if ((g[y] >> x) & 1) region[(top + li * 12 + y) * GB.REG_PX_W + x0 + c * 8 + x] = 3;
+      }
+    });
+    return GB.regionToFrame(region, stat.blank);
+  }
+  function showMessage(title, lines) {
+    const stat = GB.buildStatic(title, S.count);
+    st.placeholder = { stat, frame: textFrame(lines, stat) };
+    const p = st.palettes; st.palettes = null;
+    paint(GB.composeScreen(stat, st.placeholder.frame, 0));
+    st.palettes = p;
+  }
+  const viewKey = (v) => `${(v || st.view).z}:${(v || st.view).p}`;
+  const current = () => st.cache.get(viewKey()) || null;
+  const shown = () => { const e = current(); return e ? e.frames : null; };
+  function draw() {
+    const set = shown();
+    if (set && st.stat) paint(GB.composeScreen(st.stat, set[Math.min(st.frame, set.length - 1)], st.frame));
+    else if (st.placeholder) { const p = st.palettes; st.palettes = null; paint(GB.composeScreen(st.placeholder.stat, st.placeholder.frame, 0)); st.palettes = p; }
+  }
+
+  // ---------- device controls ----------
+  function step(d) {
+    const set = shown(); if (!set) return;
+    st.frame = (st.frame + d + set.length) % set.length; draw();
+  }
+  function framingAt(z, p) { return st.plan ? st.plan.list.find((f) => f.z === z && f.p === p) : null; }
+  function buildInto(framing) {
+    const r = GB.buildFraming(st.views, RS, framing, st.axis, settings(), st.stat.blank, st.palettes);
+    if (!st.palettes && r.palettes) st.palettes = r.palettes;
+    st.cache.set(`${framing.z}:${framing.p}`, r);
+    return r;
+  }
+  function shrinkNote() {
+    const e = current();
+    if (st.panCapped) {
+      $('shrinkHint').textContent = `向きの数が多いので、上下の段数を少し減らしています（いちばん寄ったときで${Math.max(...st.plan.zoomCounts)}段）。`;
+      return;
+    }
+    $('shrinkHint').textContent = e && e.merged > 60
+      ? 'タイル数の上限に合わせて、似た模様をまとめています。ディザを「なし」にするか、コントラストを下げると細部が出やすくなります。'
+      : '';
+  }
+  function gotoView(z, p) {
+    const fr = framingAt(z, p);
+    if (!fr || (z === st.view.z && p === st.view.p)) return;
+    st.view = { z, p };
+    if (st.cache.has(viewKey())) { draw(); shrinkNote(); return; }
+    setStatus('切り出しています…', false, false);
+    requestAnimationFrame(() => setTimeout(() => {
+      try { buildInto(fr); } catch (e) { setStatus(`変換できませんでした（${e.message}）`, true); return; }
+      if (st.lastStatus) setStatus(st.lastStatus.msg, st.lastStatus.warn);
+      draw(); shrinkNote();
+    }, 0));
+  }
+  function panStep(d) {
+    if (!st.plan) return;
+    const max = st.plan.zoomCounts[st.view.z] - 1;
+    gotoView(st.view.z, Math.max(0, Math.min(max, st.view.p + d)));
+  }
+  function zoomStep(d) {
+    if (!st.plan) return;
+    const z = Math.max(0, Math.min(st.plan.zoomCounts.length - 1, st.view.z + d));
+    const p = Math.min(st.view.p, st.plan.zoomCounts[z] - 1);
+    gotoView(z, p);
+  }
+  function upDown(d) { (st.selectHeld ? zoomStep : panStep)(d); }
+  let autoTimer = null;
+  function setAuto(on) {
+    st.auto = on && !!shown();
+    $('btnA').setAttribute('aria-pressed', String(st.auto));
+    clearInterval(autoTimer);
+    if (st.auto) autoTimer = setInterval(() => step(1), Math.round(S.speed * 1000 / 60));
+  }
+  function holdButton(el, fn) {
+    let t1 = null, t2 = null;
+    const stop = () => { clearTimeout(t1); clearInterval(t2); };
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); fn(); stop(); t1 = setTimeout(() => { t2 = setInterval(fn, 100); }, 280); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => el.addEventListener(ev, stop));
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } });
+  }
+  holdButton($('btnLeft'), () => step(-1));
+  holdButton($('btnRight'), () => step(1));
+  $('btnUp').addEventListener('click', () => upDown(st.selectHeld ? 1 : -1));
+  $('btnDown').addEventListener('click', () => upDown(st.selectHeld ? -1 : 1));
+  $('btnSelect').addEventListener('click', () => {
+    st.selectHeld = !st.selectHeld;
+    $('btnSelect').setAttribute('aria-pressed', String(st.selectHeld));
+    $('selectCap').textContent = st.selectHeld ? '上下でズーム' : '上下で移動';
+  });
+  $('btnA').addEventListener('click', () => setAuto(!st.auto));
+  $('btnB').addEventListener('click', () => { st.inverted = !st.inverted; $('btnB').setAttribute('aria-pressed', String(st.inverted)); draw(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input, textarea, select')) return;
+    if (e.key === 'ArrowLeft') { step(-1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { step(1); e.preventDefault(); }
+    else if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && e.target.closest('.device')) {
+      const up = e.key === 'ArrowUp';
+      if (e.shiftKey || st.selectHeld) zoomStep(up ? 1 : -1); else panStep(up ? -1 : 1);
+      e.preventDefault();
+    }
+  });
+
+  // ---------- three.js ----------
+  function initThree() {
+    if (st.three) return st.three;
+    if (typeof THREE === 'undefined') throw new Error('3D表示ライブラリを読み込めませんでした');
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); }
+    catch (e) { throw new Error('このブラウザでは3D表示（WebGL）が使えません。別のブラウザか端末で開いてください'); }
+    renderer.setPixelRatio(1); renderer.setSize(RS, RS, false); renderer.setClearColor(0x000000, 0);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    const scene = new THREE.Scene();
+    const amb = new THREE.AmbientLight(0xffffff, 0.6);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.4);
+    dir.position.set(-1.3, 2.2, 2.6);
+    scene.add(amb, dir);
+    const pivot = new THREE.Group(); scene.add(pivot);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 100);
+    const grad = new THREE.DataTexture(new Uint8Array([34, 255]), 2, 1, THREE.RedFormat);
+    grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
+    const c2 = document.createElement('canvas'); c2.width = c2.height = RS;
+    st.three = { renderer, scene, amb, dir, pivot, camera, grad, ctx: c2.getContext('2d', { willReadFrequently: true }) };
+    return st.three;
+  }
+
+  function disposeModel() {
+    if (!st.wrap) return;
+    st.wrap.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      ms.forEach((m) => { if (m.map) m.map.dispose(); m.dispose(); });
+    });
+    st.three.pivot.remove(st.wrap);
+    st.wrap = st.root = null; st.meshes = []; st.arms = []; st.erased = []; st.eraser = false; sampleCache.clear();
+    // Blob URLs belong to the selected files, not to the model, so they survive a reload and
+    // are only released in addFiles when their file is replaced or a new model starts over.
+  }
+
+  const baseName = (u) => { try { u = decodeURIComponent(u); } catch (e) { /* keep */ } return u.split(/[\\/]/).pop().toLowerCase(); };
+  const stem = (n) => n.replace(/\.[^.]+$/, '');
+
+  function textureResolver(missing) {
+    const urls = new Map();
+    for (const [name, file] of st.files) {
+      if (st.psdFailed.has(name)) continue;
+      let u = st.psdUrls.get(name) || st.fileUrls.get(name);
+      if (!u && /\.psd$/i.test(name)) continue;       // not converted (yet): nothing usable
+      if (!u) { u = URL.createObjectURL(file); st.fileUrls.set(name, u); }
+      urls.set(name, u);
+    }
+    const find = (name) => {
+      if (urls.has(name)) return urls.get(name);
+      const s = stem(name);
+      for (const [n, u] of urls) if (IMAGE_EXT.test(n) && stem(n) === s) return u;
+      return null;
+    };
+    return { urls, find, resolve(url) {
+      if (/^(blob|data):/.test(url)) return url;
+      // A model can reference an absolute http(s) URL (e.g. a tracking pixel); never let the
+      // browser actually fetch it. Only resources the user supplied are ever resolved.
+      if (/^https?:\/\//i.test(url)) return 'data:,';
+      const name = baseName(url);
+      const hit = find(name);
+      if (hit) return hit;
+      if (!/\.(png|jpe?g|webp|tga|bmp|gif|psd|tif|tiff|dds)$/i.test(name)) return url;
+      missing.add(name);
+      return WHITE_PX;
+    } };
+  }
+
+  // Minimal PSD reader: flattened composite only (8 bit, RGB or grayscale).
+  function decodePsd(buf) {
+    if (buf.byteLength < 34) return null;
+    const dv = new DataView(buf), bytes = new Uint8Array(buf);
+    if (dv.getUint32(0) !== 0x38425053 || dv.getUint16(4) !== 1) return null;
+    const channels = dv.getUint16(12), height = dv.getUint32(14), width = dv.getUint32(18);
+    const depth = dv.getUint16(22), mode = dv.getUint16(24);
+    if (depth !== 8 || (mode !== 3 && mode !== 1) || channels < 1 || channels > 8 ||
+      width < 1 || height < 1 || width * height > 4096 * 4096) return null;
+    let p = 26;
+    for (let i = 0; i < 3; i++) {
+      if (p + 4 > buf.byteLength) return null;
+      p += 4 + dv.getUint32(p);
+      if (p > buf.byteLength) return null;
+    }
+    if (p + 2 > buf.byteLength) return null;
+    const compression = dv.getUint16(p); p += 2;
+    const want = Math.min(channels, mode === 3 ? 4 : 2), planes = [];
+    if (compression === 0) {
+      if (p + channels * width * height > buf.byteLength) return null;
+      for (let c = 0; c < want; c++) { planes.push(bytes.subarray(p, p + width * height)); p += width * height; }
+    } else if (compression === 1) {
+      if (p + channels * height * 2 > buf.byteLength) return null;
+      const counts = new Uint32Array(channels * height);
+      for (let i = 0; i < channels * height; i++) { counts[i] = dv.getUint16(p); p += 2; }
+      for (let c = 0; c < channels; c++) {
+        const plane = new Uint8Array(width * height); let o = 0;
+        for (let y = 0; y < height; y++) {
+          const end = p + counts[c * height + y];
+          while (p < end && o < plane.length) {
+            const b = dv.getInt8(p++);
+            if (b >= 0) { for (let i = 0; i <= b && o < plane.length; i++) plane[o++] = bytes[p++]; }
+            else if (b > -128) { const v = bytes[p++]; for (let i = 0; i < 1 - b && o < plane.length; i++) plane[o++] = v; }
+          }
+          p = end;
+        }
+        if (c < want) planes.push(plane);
+      }
+    } else return null;
+    const data = new Uint8ClampedArray(width * height * 4);
+    for (let i = 0, q = 0; i < width * height; i++, q += 4) {
+      if (mode === 3) {
+        data[q] = planes[0][i]; data[q + 1] = planes[1][i]; data[q + 2] = planes[2][i];
+        data[q + 3] = planes.length > 3 ? planes[3][i] : 255;
+      } else {
+        const v = planes[0][i];
+        data[q] = data[q + 1] = data[q + 2] = v;
+        data[q + 3] = planes.length > 1 ? planes[1][i] : 255;
+      }
+    }
+    return { width, height, data };
+  }
+  async function psdToUrl(file) {
+    try {
+      const img = decodePsd(await file.arrayBuffer());
+      if (!img) return null;
+      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+      c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
+      const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
+      return blob ? URL.createObjectURL(blob) : null;
+    } catch (e) { return null; }
+  }
+
+  const alphaCache = new Map();
+  // Unity-style FBX rarely flags cutout materials, so look at the texture itself.
+  function textureHasAlpha(tex) {
+    if (!tex || !tex.image) return false;
+    if (alphaCache.has(tex.uuid)) return alphaCache.get(tex.uuid);
+    let result = false;
+    const img = tex.image;
+    try {
+      if (img.data && img.width && img.height) {
+        const d = img.data; let clear = 0, n = 0;
+        for (let i = 3; i < d.length; i += 16) { n++; if (d[i] < 200) clear++; }
+        result = n > 0 && clear > n * 0.02;
+      } else {
+        const w = Math.min(96, img.width || 96), h = Math.min(96, img.height || 96);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const cx = c.getContext('2d', { willReadFrequently: true });
+        cx.drawImage(img, 0, 0, w, h);
+        const d = cx.getImageData(0, 0, w, h).data;
+        let clear = 0;
+        for (let i = 3; i < d.length; i += 4) if (d[i] < 200) clear++;
+        result = clear > (d.length / 4) * 0.02;
+      }
+    } catch (e) { result = false; }
+    alphaCache.set(tex.uuid, result);
+    return result;
+  }
+  const FACE_PART = /eye|iris|pupil|brow|lash|mouth|teeth|tongue|face|head|\u76ee|\u77b3|\u7708|\u307e\u3064|\u53e3|\u9854|\u982d/i;
+  function applyCutout() {
+    st.meshes.forEach((mesh) => materialsOf(mesh).forEach((m) => {
+      const want = (m.userData.orig || (S.cutout && m.userData.cut)) ? 0.5 : 0;
+      if (m.alphaTest !== want) { m.alphaTest = want; m.needsUpdate = true; }
+    }));
+  }
+
+  function guessTexture(names) {
+    const keys = [...st.texUrls.keys()];
+    const norm = (v) => v.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9\u3040-\u30ff\u4e00-\u9faf]/g, '');
+    for (const want of names.filter(Boolean).map(norm)) {
+      if (!want) continue;
+      let hit = keys.find((k) => norm(k) === want);
+      if (!hit) hit = keys.find((k) => norm(k).includes(want) || want.includes(norm(k)));
+      if (hit) return hit;
+    }
+    return null;
+  }
+  function materialsOf(mesh) { return Array.isArray(mesh.material) ? mesh.material : [mesh.material]; }
+  function makeTexture(url, onReady) {
+    const tex = new THREE.TextureLoader().load(url, onReady);
+    tex.flipY = !st.isGltf; tex.encoding = THREE.sRGBEncoding;
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }
+  // One texture per material slot: avatars keep face, body and hair on separate materials.
+  function applyTexture(part, imageName) {
+    const url = st.texUrls.get(imageName);
+    if (!url) return false;
+    const m = part.mat;
+    const tex = makeTexture(url, () => {
+      m.userData.cut = textureHasAlpha(tex);
+      m.alphaTest = (m.userData.orig || (S.cutout && m.userData.cut)) ? 0.5 : 0;
+      m.needsUpdate = true;
+      schedule(true);
+    });
+    m.map = tex; m.color.setRGB(1, 1, 1); m.needsUpdate = true;
+    part.texName = imageName;
+    return true;
+  }
+
+  // Adding textures later reloads the same model; carry the user's edits over to the new load.
+  // Meshes are matched by their traversal order, which is stable for the same file.
+  function snapshotEdits() {
+    const mi = new Map(st.meshes.map((m, i) => [m, i]));
+    return {
+      meshVis: st.meshes.map((m) => m.visible),
+      parts: st.parts.map((p) => ({ key: `${mi.get(p.mesh)}:${p.slot}`, visible: p.mat.visible !== false,
+        manual: !!p.manual, texName: p.texName })),
+      shapes: (st.shapes || []).map((sh) => ({ key: `${mi.get(sh.mesh)}:${sh.key}`, value: sh.mesh.morphTargetInfluences[sh.index] })),
+      erased: st.erased.map((e) => ({ mesh: mi.get(e.mesh), island: e.whole ? -1 : e.island })),
+    };
+  }
+  function restoreEdits(snap) {
+    if (!snap || snap.meshVis.length !== st.meshes.length) return false;
+    st.meshes.forEach((m, i) => { m.visible = snap.meshVis[i]; });
+    const mi = new Map(st.meshes.map((m, i) => [m, i]));
+    const parts = new Map(st.parts.map((p) => [`${mi.get(p.mesh)}:${p.slot}`, p]));
+    snap.parts.forEach((s) => {
+      const p = parts.get(s.key); if (!p) return;
+      p.mat.visible = s.visible;
+      if (!s.manual) return;
+      p.manual = true;
+      if (s.texName && st.texUrls.has(s.texName)) applyTexture(p, s.texName);
+      else if (!s.texName) { p.mat.map = null; p.mat.needsUpdate = true; p.texName = ''; }
+    });
+    const shapes = new Map((st.shapes || []).map((sh) => [`${mi.get(sh.mesh)}:${sh.key}`, sh]));
+    snap.shapes.forEach((s) => { const sh = shapes.get(s.key); if (sh) sh.mesh.morphTargetInfluences[sh.index] = s.value; });
+    snap.erased.forEach((e) => {
+      const m = st.meshes[e.mesh]; if (!m) return;
+      if (e.island < 0) { m.visible = false; st.erased.push({ mesh: m, whole: true, removed: 0 }); }
+      else eraseIsland(m, e.island);
+    });
+    return true;
+  }
+
+  const MAX_MODEL_BYTES = 500 * 1024 * 1024;
+  async function loadModel() {
+    const token = ++st.loadToken;
+    const f = st.modelFile;
+    if (f.size > MAX_MODEL_BYTES) {
+      setStatus(`${f.name} は大きすぎます（${Math.round(f.size / 1048576)}MB、上限500MB）。軽量化してから読み込んでください。`, true);
+      showMessage('NO AVATAR', ['FILE TOO', 'LARGE']);
+      return;
+    }
+    clearTimeout(rebuildTimer);
+    setAuto(false);
+    setStatus(`${f.name} を読み込んでいます…`);
+    showMessage('LOADING', ['LOADING...']);
+    $('led').classList.remove('on');
+    let T;
+    try { T = initThree(); } catch (e) { setStatus(`${e.message}。`, true); showMessage('NO AVATAR', ['NO WEBGL']); return; }
+    const snap = (st.wrap && st.lastModelFile === f) ? snapshotEdits() : null;
+    st.lastModelFile = f;
+    disposeModel();
+    st.plan = null; st.cache = new Map(); updateExport();
+    for (const [name, file] of st.files) {
+      if (!/\.psd$/i.test(name) || st.psdUrls.has(name)) continue;
+      const url = await psdToUrl(file);
+      if (url) st.psdUrls.set(name, url);
+      else st.psdFailed.add(name);
+    }
+    const missing = new Set();
+    const res = textureResolver(missing);
+    st.texUrls = new Map([...res.urls].filter(([n]) => IMAGE_EXT.test(n)));
+    const manager = new THREE.LoadingManager();
+    manager.setURLModifier((u) => res.resolve(u));
+    if (THREE.TGALoader) manager.addHandler(/\.tga$/i, new THREE.TGALoader(manager));
+    let root, humanoid = null, vrm0 = false;
+    st.vrmHead = null;
+    try {
+      const buf = await f.arrayBuffer();
+      st.isGltf = false;
+      if (/\.fbx$/i.test(f.name)) {
+        let started = false; const done = new Promise((r) => { manager.onLoad = r; });
+        manager.onStart = () => { started = true; };
+        root = new THREE.FBXLoader(manager).parse(buf, '');
+        if (started) await Promise.race([done, new Promise((r) => setTimeout(r, 20000))]);
+      } else {
+        const gltf = await new Promise((resolve, reject) => new THREE.GLTFLoader(manager).parse(buf, '', resolve, reject));
+        root = gltf.scene || gltf.scenes[0];
+        st.isGltf = true;
+        humanoid = await vrmArms(gltf);
+        vrm0 = !!(gltf.parser.json.extensions && gltf.parser.json.extensions.VRM);
+      }
+    } catch (e) {
+      if (token !== st.loadToken) return;
+      console.error(e);
+      setStatus(`${f.name} を読み込めませんでした（${(e && e.message) || e}）。FBXかVRMのファイルを選んでください。`, true);
+      showMessage('NO AVATAR', ['COULD NOT', 'READ FILE']);
+      return;
+    }
+    if (token !== st.loadToken) return;
+
+    const MAX_VERTS = 3000000;
+    let totalVerts = 0;
+    root.traverse((o) => { if (o.isMesh && o.geometry && o.geometry.attributes.position) totalVerts += o.geometry.attributes.position.count; });
+    if (totalVerts > MAX_VERTS) {
+      setStatus(`このモデルは頂点数が多すぎます（約${Math.round(totalVerts / 10000)}万、上限${MAX_VERTS / 10000}万）。ポリゴン数を減らしてから読み込んでください。`, true);
+      showMessage('NO AVATAR', ['TOO MANY', 'POLYGONS']);
+      return;
+    }
+
+    // materials: flat toon shading, keep texture and cutout
+    const placeholderNames = new Set();
+    root.traverse((o) => {
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      if (o.geometry && o.geometry.attributes.position && !o.geometry.attributes.normal) o.geometry.computeVertexNormals();
+      const conv = (m) => {
+        let map = m.map || null;
+        if (map && !map.image) {
+          const name = guessTexture([map.name, m.name, o.name]);
+          if (name) { const t = makeTexture(st.texUrls.get(name)); t.flipY = map.flipY; map = t; }
+          else { if (map.name) placeholderNames.add(map.name); map = null; }
+        }
+        if (map) map.encoding = THREE.sRGBEncoding;
+        const color = map ? new THREE.Color(1, 1, 1) : (m.color ? m.color.clone() : new THREE.Color(0.85, 0.85, 0.85));
+        const orig = !!(map && (m.transparent || m.alphaTest > 0));
+        const cut = !!(map && textureHasAlpha(map));
+        const nm = new THREE.MeshToonMaterial({ color, map, gradientMap: T.grad, side: THREE.DoubleSide,
+          alphaTest: (orig || (S.cutout && cut)) ? 0.5 : 0 });
+        nm.name = m.name;
+        nm.userData = { orig, cut };
+        if (FACE_PART.test(`${m.name || ''} ${o.name || ''}`)) {
+          nm.polygonOffset = true; nm.polygonOffsetFactor = -4; nm.polygonOffsetUnits = -4;
+        }
+        return nm;
+      };
+      o.material = Array.isArray(o.material) ? o.material.map(conv) : conv(o.material);
+      st.meshes.push(o);
+    });
+    if (!st.meshes.length) {
+      setStatus('このファイルには表示できるメッシュが入っていませんでした。', true);
+      showMessage('NO AVATAR', ['NO MESH', 'FOUND']);
+      return;
+    }
+
+    st.parts = [];
+    st.meshes.forEach((mesh) => materialsOf(mesh).forEach((mat, i) => st.parts.push({ mesh, mat, slot: i, texName: '' })));
+    const names = [...st.texUrls.keys()];
+    let textured = 0; const plain = [];
+    st.parts.forEach((part) => {
+      if (part.mat.map) { textured++; return; }
+      let guess = guessTexture([part.mat.name, part.mesh.name]);
+      if (!guess && names.length === 1) guess = names[0];
+      if (guess && applyTexture(part, guess)) textured++;
+      else plain.push(part.mat.name || part.mesh.name || 'パーツ');
+    });
+    st.textureReport = { textured, plain, total: st.parts.length };
+
+    st.root = root;
+    st.wrap = new THREE.Group(); st.wrap.add(root); T.pivot.rotation.set(0, 0, 0); T.pivot.add(st.wrap);
+    st.wrap.updateMatrixWorld(true);
+    const box = meshBounds(st.meshes);
+    const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+    st.wrap.position.set(-center.x, -box.min.y, -center.z);
+    st.H = size.y || 1; st.span = Math.max(size.y, size.x, size.z) || 1;
+    st.wrap.updateMatrixWorld(true);
+
+    st.headBone = findHeadBone(root, st.vrmHead);
+    st.arms = humanoid || findArmBones(root);
+    st.arms.forEach((a) => { a.rest = a.bone.quaternion.clone(); });
+    $('arms').disabled = st.arms.length < 2;
+    $('armsNote').textContent = st.arms.length < 2 ? '腕のボーンが見つからないため使えません。' : 'Tポーズのモデルで腕を体に寄せます。';
+    if (st.arms.length < 2) { S.arms = 0; $('arms').value = 0; syncOutputs(); }
+
+    if (vrm0) { S.startDeg = 180; $('startDeg').value = 180; syncOutputs(); }
+    const guess = stem(f.name).replace(/[^\x20-\x7e]/g, '').trim();
+    if (!$('name').value) { $('name').value = guess.slice(0, GB.MAX_NAME); S.name = $('name').value; }
+
+    buildPartsList();
+    if (snap) {
+      const mi = new Map(st.meshes.map((m, i) => [m, i]));
+      const defaults = new Map((st.shapes || []).map((sh) => [`${mi.get(sh.mesh)}:${sh.key}`, sh.base]));
+      if (restoreEdits(snap)) {
+        buildPartsList();   // redraw checkboxes, pickers and sliders with the carried-over values
+        (st.shapes || []).forEach((sh) => { const d = defaults.get(`${mi.get(sh.mesh)}:${sh.key}`); if (d !== undefined) sh.base = d; });
+        updateEraser();
+      }
+    }
+    const texCount = st.texUrls.size;
+    const rep = st.textureReport;
+    let msg = `${f.name} を読み込みました。`;
+    let warn = false;
+    if (rep.textured) msg += `テクスチャは${rep.total}マテリアル中${rep.textured}個に反映されています。`;
+    if (rep.plain.length) {
+      warn = true;
+      const external = /\.(fbx|gltf)$/i.test(f.name);
+      msg += texCount
+        ? `${rep.plain.slice(0, 3).join('、')}${rep.plain.length > 3 ? ' ほか' : ''}にはテクスチャが見つかりません。「パーツとテクスチャ」で画像を選べます。`
+        : external
+          ? 'テクスチャの画像が一緒に入っていません。モデルと同じフォルダのPNGも選ぶと色が付きます。'
+          : 'このモデルにはテクスチャが入っていないようなので、陰影だけで表示します。';
+    }
+    if (st.psdFailed.size) { warn = true; msg += ` PSD（${[...st.psdFailed].slice(0, 2).join('、')}）は読めませんでした。PNGに書き出したものを選んでください。`; }
+    const miss = [...missing, ...placeholderNames].filter((n) => n && n !== 'undefined');
+    if (miss.length) { warn = true; msg += ` 見つからないファイル：${miss.slice(0, 3).join('、')}${miss.length > 3 ? ' ほか' : ''}。`; }
+    setStatus(msg, warn);
+    $('led').classList.add('on');
+    st.frame = 0;
+    rebuild(true);
+    const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setAuto(S.autoStart && !calm);
+  }
+
+
+  // Bounds from actual (skinned) vertex positions, so armature scale quirks don't matter.
+  function meshBounds(meshes) {
+    const box = new THREE.Box3(), v = new THREE.Vector3();
+    for (const m of meshes) {
+      if (!m.visible || !m.geometry || !m.geometry.attributes.position) continue;
+      const pos = m.geometry.attributes.position, stepN = Math.max(1, Math.floor(pos.count / 30000));
+      const skinned = m.isSkinnedMesh && m.skeleton && m.geometry.attributes.skinIndex;
+      if (skinned) m.skeleton.update();
+      for (let i = 0; i < pos.count; i += stepN) {
+        v.fromBufferAttribute(pos, i);
+        if (skinned) m.boneTransform(i, v);
+        v.applyMatrix4(m.matrixWorld);
+        box.expandByPoint(v);
+      }
+    }
+    return box;
+  }
+
+  function findHeadBone(root, given) {
+    if (given) return given;
+    let best = null, score = -1;
+    root.traverse((o) => {
+      if (!o.isBone) return;
+      const raw = o.name || '', n = raw.toLowerCase().replace(/mixamorig\d*[:_]?/, '');
+      let sc = -1;
+      if (/(^|[^a-z])head([^a-z]|$)/.test(n) && !/top|end|attach|eye/.test(n)) sc = 3;
+      else if (/\u982d/.test(raw) && !/\u5148/.test(raw)) sc = 3;
+      else if (/(^|[^a-z])neck([^a-z]|$)|\u9996/.test(n)) sc = 1;
+      if (sc > score) { score = sc; best = o; }
+    });
+    return score > 0 ? best : null;
+  }
+
+  async function vrmArms(gltf) {
+    const ext = gltf.parser.json.extensions || {};
+    let l, r;
+    if (ext.VRM && ext.VRM.humanoid) {
+      for (const b of ext.VRM.humanoid.humanBones || []) { if (b.bone === 'leftUpperArm') l = b.node; if (b.bone === 'rightUpperArm') r = b.node; }
+    } else if (ext.VRMC_vrm && ext.VRMC_vrm.humanoid) {
+      const hb = ext.VRMC_vrm.humanoid.humanBones || {};
+      l = hb.leftUpperArm && hb.leftUpperArm.node; r = hb.rightUpperArm && hb.rightUpperArm.node;
+    }
+    let headIdx;
+    if (ext.VRM && ext.VRM.humanoid) for (const b of ext.VRM.humanoid.humanBones || []) { if (b.bone === 'head') headIdx = b.node; }
+    else if (ext.VRMC_vrm && ext.VRMC_vrm.humanoid) {
+      const hb = ext.VRMC_vrm.humanoid.humanBones || {};
+      headIdx = hb.head && hb.head.node;
+    }
+    if (headIdx !== undefined) st.vrmHead = await gltf.parser.getDependency('node', headIdx);
+    if (l === undefined || r === undefined) return null;
+    const out = [];
+    for (const idx of [l, r]) {
+      const bone = await gltf.parser.getDependency('node', idx);
+      const child = bone.children.find((c) => c.isBone || c.type === 'Bone' || c.children.length) || bone.children[0];
+      if (bone && child) out.push({ bone, child });
+    }
+    return out.length === 2 ? out : null;
+  }
+
+  function findArmBones(root) {
+    const bones = []; root.traverse((o) => { if (o.isBone) bones.push(o); });
+    const depth = (o) => { let d = 0; while (o.parent) { o = o.parent; d++; } return d; };
+    const classify = (b) => {
+      const raw = b.name || '';
+      if (/左腕/.test(raw) && !/捩|ひじ|肘/.test(raw)) return 'L';
+      if (/右腕/.test(raw) && !/捩|ひじ|肘/.test(raw)) return 'R';
+      const n = raw.toLowerCase().replace(/mixamorig\d*[:_]?/, '');
+      if (/fore|lower|twist|hand|shoulder|clav|elbow|wrist|finger|thumb|index|middle|ring|little|pinky|sleeve|skirt|hair|ribbon|bust|breast|armor|armour|end$/.test(n)) return null;
+      if (!/upper[\s_.-]?arm|(^|[^a-z])arm([^a-z]|$)|(left|right)arm|arm[\s_.-]?[lr]$/.test(n)) return null;
+      const L = /left|(^|[^a-z])l([^a-z]|$)/.test(n), R = /right|(^|[^a-z])r([^a-z]|$)/.test(n);
+      return L && !R ? 'L' : R && !L ? 'R' : null;
+    };
+    const pick = (side) => bones.filter((b) => classify(b) === side).sort((a, b) => depth(a) - depth(b))[0];
+    const out = [];
+    for (const side of ['L', 'R']) {
+      const bone = pick(side); if (!bone) continue;
+      const kids = bone.children.filter((c) => c.isBone);
+      const child = kids.find((c) => /fore|lower|elbow|ひじ|肘/i.test(c.name)) || kids[0];
+      if (child) out.push({ bone, child });
+    }
+    return out.length === 2 ? out : [];
+  }
+
+  function poseArms() {
+    if (st.arms.length < 2) return;
+    const T = st.three; T.pivot.rotation.y = 0;
+    st.arms.forEach((a) => { a.bone.quaternion.copy(a.rest); });
+    st.wrap.updateMatrixWorld(true);
+    if (!S.arms) return;
+    const down = new THREE.Vector3(0, -1, 0);
+    for (const a of st.arms) {
+      const p0 = a.bone.getWorldPosition(new THREE.Vector3()), p1 = a.child.getWorldPosition(new THREE.Vector3());
+      const dirv = p1.sub(p0).normalize();
+      const toDown = dirv.angleTo(down);
+      const ang = Math.min(THREE.MathUtils.degToRad(S.arms), Math.max(0, toDown - THREE.MathUtils.degToRad(12)));
+      const axis = new THREE.Vector3().crossVectors(dirv, down);
+      if (axis.lengthSq() < 1e-8 || ang <= 0) continue;
+      axis.normalize();
+      const R = new THREE.Quaternion().setFromAxisAngle(axis, ang);
+      const P = a.bone.parent.getWorldQuaternion(new THREE.Quaternion());
+      const q = P.clone().invert().multiply(R).multiply(P).multiply(a.bone.quaternion);
+      a.bone.quaternion.copy(q);
+      a.bone.updateMatrixWorld(true);
+    }
+  }
+
+  function renderViews() {
+    const T = st.three;
+    T.amb.intensity = 1 - 0.7 * S.shading; T.dir.intensity = 0.7 * S.shading;
+    poseArms();
+    const half = st.span * 0.64, e = THREE.MathUtils.degToRad(S.elev), dist = st.span * 8;
+    const cam = T.camera;
+    cam.left = -half; cam.right = half; cam.top = half; cam.bottom = -half; cam.near = 0.001; cam.far = dist * 3;
+    cam.position.set(0, st.H / 2 + Math.sin(e) * dist, Math.cos(e) * dist); cam.lookAt(0, st.H / 2, 0);
+    cam.updateProjectionMatrix(); cam.updateMatrixWorld(true);
+    const g = new THREE.Vector3(0, 0, 0).project(cam);
+    st.axis = { x: (g.x + 1) / 2 * RS, y: (1 - g.y) / 2 * RS };
+    const views = [], anchors = [], base = THREE.MathUtils.degToRad(S.startDeg);
+    const v3 = new THREE.Vector3();
+    for (let i = 0; i < S.count; i++) {
+      T.pivot.rotation.y = base + i * Math.PI * 2 / S.count;
+      T.renderer.render(T.scene, cam);
+      T.ctx.clearRect(0, 0, RS, RS); T.ctx.drawImage(T.renderer.domElement, 0, 0);
+      views.push(T.ctx.getImageData(0, 0, RS, RS).data);
+      if (st.headBone) {
+        st.headBone.updateWorldMatrix(true, false);
+        const p = st.headBone.getWorldPosition(v3).project(cam);
+        anchors.push({ x: (p.x + 1) / 2 * RS, y: (1 - p.y) / 2 * RS });
+      }
+    }
+    st.anchors = anchors.length === S.count ? anchors : null;
+    T.pivot.rotation.y = base;
+    return views;
+  }
+
+  let rebuildTimer = null, viewsDirty = true;
+  function schedule(render) {
+    if (render) viewsDirty = true;
+    clearTimeout(rebuildTimer);
+    rebuildTimer = setTimeout(() => {
+      if (st.wrap && S.count > 12) setStatus('ドットに変換しています…', false, false);
+      requestAnimationFrame(() => setTimeout(() => rebuild(false), 0));
+    }, 140);
+  }
+  function rebuild(forceViews) {
+    if (!st.wrap) { if (st.placeholder) showMessage(st.placeholder.stat.name, ['INSERT', 'AVATAR']); return; }
+    try {
+      if (forceViews || viewsDirty || !st.views) {
+        st.views = renderViews(); st.crop = GB.unionCrop(st.views, RS); viewsDirty = false;
+      }
+      if (!st.crop) { setStatus('モデルが画面に映りませんでした。表示するパーツを確認してください。', true); st.plan = null; updateExport(); return; }
+      st.stat = GB.buildStatic(S.name || 'MY AVATAR', S.count);
+      let pan = S.panSteps, plan = GB.planFramings(st.views, RS, st.crop, st.anchors, S.zoomSteps, pan);
+      const tooBig = (pl) => pl.list.length * S.count > GB.MAX_RECORDS || GB.romSize(pl.list.length * S.count, S.color) > 2 * 1024 * 1024;
+      while (pan > 1 && tooBig(plan)) {
+        pan--; plan = GB.planFramings(st.views, RS, st.crop, st.anchors, S.zoomSteps, pan);
+      }
+      st.panCapped = pan < S.panSteps;
+      st.plan = plan;
+      st.cache = new Map(); st.palettes = null;
+      const r = buildInto(st.plan.list[0]);
+      if (st.view.z >= st.plan.zoomCounts.length) st.view = { z: 0, p: 0 };
+      st.view.p = Math.min(st.view.p, st.plan.zoomCounts[st.view.z] - 1);
+      if (viewKey() !== '0:0') buildInto(framingAt(st.view.z, st.view.p));
+      if (st.frame >= S.count) st.frame = 0;
+      st.romSize = GB.romSize(st.plan.list.length * S.count, S.color);
+      draw(); updateExport(); shrinkNote();
+      if (st.lastStatus) { setStatus(st.lastStatus.msg, st.lastStatus.warn); }
+    } catch (e) {
+      console.error(e);
+      setStatus(`変換中に問題が起きました（${e.message}）。`, true);
+    }
+  }
+
+  // ---------- eraser ----------
+  const sampleCache = new Map();
+  function sampleAlpha(tex, u, v) {
+    if (!tex || !tex.image) return 1;
+    let s = sampleCache.get(tex.uuid);
+    if (!s) {
+      try {
+        const img = tex.image, w = Math.min(256, img.width || 256), h = Math.min(256, img.height || 256);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const cx = c.getContext('2d', { willReadFrequently: true });
+        if (img.data && img.width) {
+          const id = new ImageData(new Uint8ClampedArray(img.data.buffer ? img.data : img.data), img.width, img.height);
+          const tmp = document.createElement('canvas'); tmp.width = img.width; tmp.height = img.height;
+          tmp.getContext('2d').putImageData(id, 0, 0);
+          cx.drawImage(tmp, 0, 0, w, h);
+        } else cx.drawImage(img, 0, 0, w, h);
+        s = { w, h, data: cx.getImageData(0, 0, w, h).data };
+      } catch (e) { s = null; }
+      sampleCache.set(tex.uuid, s);
+    }
+    if (!s) return 1;
+    const uu = ((u % 1) + 1) % 1, vv = ((v % 1) + 1) % 1;
+    const x = Math.min(s.w - 1, Math.floor(uu * s.w));
+    const y = Math.min(s.h - 1, Math.floor((tex.flipY ? 1 - vv : vv) * s.h));
+    return s.data[(y * s.w + x) * 4 + 3] / 255;
+  }
+
+  // Connected pieces of a mesh: an ahoge is usually its own island of triangles.
+  function islandsOf(mesh) {
+    if (mesh.userData.islands) return mesh.userData.islands;
+    const geo = mesh.geometry, pos = geo.attributes.position;
+    if (!geo.index) {
+      const idx = new Uint32Array(pos.count);
+      for (let i = 0; i < pos.count; i++) idx[i] = i;
+      geo.setIndex(new THREE.BufferAttribute(idx, 1));
+    }
+    const index = geo.index.array, triCount = index.length / 3;
+    const weld = new Int32Array(pos.count), seen = new Map();
+    for (let i = 0; i < pos.count; i++) {
+      const key = `${Math.round(pos.getX(i) * 4096)},${Math.round(pos.getY(i) * 4096)},${Math.round(pos.getZ(i) * 4096)}`;
+      let id = seen.get(key);
+      if (id === undefined) { id = seen.size; seen.set(key, id); }
+      weld[i] = id;
+    }
+    const parent = new Int32Array(seen.size);
+    for (let i = 0; i < parent.length; i++) parent[i] = i;
+    const find = (x) => { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+    const union = (x, y) => { const a = find(x), b = find(y); if (a !== b) parent[a] = b; };
+    for (let t = 0; t < triCount; t++) {
+      const a = weld[index[t * 3]], b = weld[index[t * 3 + 1]], c = weld[index[t * 3 + 2]];
+      union(a, b); union(b, c);
+    }
+    const triIsland = new Int32Array(triCount);
+    const ids = new Map();
+    for (let t = 0; t < triCount; t++) {
+      const root = find(weld[index[t * 3]]);
+      let id = ids.get(root);
+      if (id === undefined) { id = ids.size; ids.set(root, id); }
+      triIsland[t] = id;
+    }
+    const info = { triIsland, count: ids.size, original: geo.index.array.slice() };
+    mesh.userData.islands = info;
+    return info;
+  }
+  function eraseIsland(mesh, island) {
+    const info = islandsOf(mesh), geo = mesh.geometry;
+    const keep = [], src = geo.index.array;
+    let removed = 0;
+    for (let t = 0; t < info.triIsland.length; t++) {
+      if (info.triIsland[t] === island) { removed++; continue; }
+      keep.push(src[t * 3], src[t * 3 + 1], src[t * 3 + 2]);
+    }
+    if (!keep.length) {            // the whole mesh is one piece: hide it instead
+      mesh.visible = false;
+      st.erased.push({ mesh, whole: true, removed: info.triIsland.length });
+      return -1;
+    }
+    if (!removed) return 0;
+    const arr = src.length > 65535 ? new Uint32Array(keep) : new Uint16Array(keep);
+    geo.setIndex(new THREE.BufferAttribute(arr, 1));
+    geo.computeBoundingSphere();
+    st.erased.push({ mesh, island, removed });
+    return removed;
+  }
+  function restoreErased() {
+    const meshes = new Set(st.erased.map((e) => e.mesh));
+    meshes.forEach((m) => {
+      m.visible = true;
+      const info = m.userData.islands;
+      if (!info) return;
+      m.geometry.setIndex(new THREE.BufferAttribute(info.original.slice(), 1));
+      m.geometry.computeBoundingSphere();
+    });
+    st.erased = [];
+    updateEraser();
+    buildPartsList();
+    schedule(true);
+  }
+  function updateEraser() {
+    $('eraser').setAttribute('aria-pressed', String(st.eraser));
+    $('eraseUndo').disabled = st.erased.length === 0;
+    $('eraseHint').textContent = st.eraser
+      ? '画面の消したいところをタップ'
+      : (st.erased.length ? `${st.erased.length}か所消しています` : '');
+    scr.style.cursor = st.eraser ? 'crosshair' : '';
+  }
+  // screen pixel -> camera ray -> the mesh triangle behind it
+  function pickAt(px, py) {
+    const T = st.three, entry = current(), meta = entry && entry.meta;
+    if (!T || !meta) return null;
+    const crop = meta.crops[st.frame] || meta.crops[0];
+    const ix = px - 8 - meta.xOff, iy = py - 8 - meta.yOff;
+    const ray = new THREE.Raycaster();
+    const base = THREE.MathUtils.degToRad(S.startDeg);
+    T.pivot.rotation.y = base + st.frame * Math.PI * 2 / S.count;
+    T.pivot.updateMatrixWorld(true);
+    const targets = st.meshes.filter((m) => m.visible);
+    const spiral = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0], [1, -1], [1, 1], [-1, 1], [-1, -1], [0, -2], [2, 0], [0, 2], [-2, 0]];
+    let hit = null;
+    for (const [dx, dy] of spiral) {
+      const sx = crop.x + (ix + dx + 0.5) * crop.w / meta.tw;
+      const sy = crop.y + (iy + dy + 0.5) * crop.h / meta.th;
+      ray.setFromCamera({ x: sx / RS * 2 - 1, y: 1 - sy / RS * 2 }, T.camera);
+      const hits = ray.intersectObjects(targets, false);
+      for (const h of hits) {
+        const mats = materialsOf(h.object);
+        const mat = mats.length > 1 && h.face ? mats[0] : mats[0];
+        const m = h.object.material;
+        const use = Array.isArray(m) ? m.find((x) => x && x.visible !== false) : m;
+        if (use && use.visible === false) continue;
+        if (use && use.map && use.alphaTest > 0 && h.uv && sampleAlpha(use.map, h.uv.x, h.uv.y) < 0.5) continue;
+        hit = h; break;
+      }
+      if (hit) break;
+    }
+    T.pivot.rotation.y = base;
+    T.pivot.updateMatrixWorld(true);
+    return hit;
+  }
+  function eraseAt(px, py) {
+    const hit = pickAt(px, py);
+    if (!hit || hit.faceIndex === undefined) { setStatus('そこには消せるパーツがありませんでした。', true); return; }
+    const mesh = hit.object, info = islandsOf(mesh);
+    const island = info.triIsland[hit.faceIndex];
+    const total = info.triIsland.length;
+    let count = 0;
+    for (let t = 0; t < total; t++) if (info.triIsland[t] === island) count++;
+    const removed = eraseIsland(mesh, island);
+    if (!removed) { setStatus('そこには消せるパーツがありませんでした。', true); return; }
+    const label = mesh.name || 'パーツ';
+    if (removed < 0) setStatus(`${label} はひと続きの形だったので、パーツごと消しました。戻すときは「元に戻す」。`);
+    else setStatus(`${label} の一部を消しました（このメッシュの${Math.round(count / total * 100)}%）。戻すときは「元に戻す」。`);
+    updateEraser();
+    buildPartsList();
+    schedule(true);
+  }
+
+  // ---------- parts ----------
+  function buildPartsList() {
+    const box = $('parts'); box.textContent = '';
+    $('partsEmpty').hidden = st.meshes.length > 0;
+    const names = [...st.texUrls.keys()];
+    st.meshes.forEach((mesh, i) => {
+      const group = document.createElement('div'); group.className = 'part';
+      const lab = document.createElement('label'); lab.className = 'check';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = mesh.visible;
+      cb.addEventListener('change', () => { mesh.visible = cb.checked; schedule(true); });
+      lab.append(cb, document.createTextNode(mesh.name || `パーツ ${i + 1}`));
+      group.append(lab);
+      st.parts.filter((p) => p.mesh === mesh).forEach((part, j) => {
+        const row = document.createElement('div'); row.className = 'mat';
+        const vis = document.createElement('input'); vis.type = 'checkbox'; vis.checked = part.mat.visible !== false;
+        vis.setAttribute('aria-label', `${part.mat.name || 'マテリアル'} を表示`);
+        vis.addEventListener('change', () => { part.mat.visible = vis.checked; schedule(true); });
+        const thumb = document.createElement('span'); thumb.className = 'thumb';
+        const name = document.createElement('span'); name.className = 'matname';
+        name.textContent = part.mat.name || `マテリアル ${j + 1}`;
+        if (!names.length) {
+          row.classList.add('noTex');
+          row.append(vis, name);
+          group.append(row);
+          return;
+        }
+        const sel = document.createElement('select'); sel.className = 'texsel';
+        sel.setAttribute('aria-label', `${part.mat.name || 'マテリアル'} のテクスチャ`);
+        const none = document.createElement('option'); none.value = ''; none.textContent = part.texName ? 'なし' : 'そのまま';
+        sel.append(none);
+        names.forEach((n) => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.append(o); });
+        sel.value = part.texName || '';
+        const paint = () => {
+          thumb.textContent = '';
+          const url = part.texName ? st.texUrls.get(part.texName) : null;
+          if (url) { const im = document.createElement('img'); im.src = url; im.alt = ''; thumb.append(im); }
+        };
+        sel.addEventListener('change', () => {
+          part.manual = true;
+          if (sel.value) applyTexture(part, sel.value);
+          else { part.mat.map = null; part.mat.needsUpdate = true; part.texName = ''; schedule(true); }
+          paint(); none.textContent = part.texName ? 'なし' : 'そのまま';
+        });
+        paint();
+        row.append(vis, thumb, name, sel);
+        group.append(row);
+      });
+      group.dataset.name = `${mesh.name || ''} ${st.parts.filter((p) => p.mesh === mesh).map((p) => p.mat.name || '').join(' ')}`.toLowerCase();
+      box.append(group);
+    });
+    if (st.textureReport && st.textureReport.plain.length) $('partsDetails').open = true;
+    buildShapeList();
+  }
+
+  // Shape keys: the usual way an avatar hides its own bits (ahoge, socks, sleeves).
+  function buildShapeList() {
+    st.shapes = [];
+    st.meshes.forEach((mesh) => {
+      const dict = mesh.morphTargetDictionary;
+      if (!dict || !mesh.morphTargetInfluences) return;
+      Object.keys(dict).forEach((key) => {
+        const index = dict[key];
+        st.shapes.push({ mesh, key, index, base: mesh.morphTargetInfluences[index] || 0,
+          hay: `${key} ${mesh.name || ''}`.toLowerCase() });
+      });
+    });
+    $('shapeDetails').hidden = st.shapes.length === 0;
+    if (!st.shapes.length) return;
+    let prefix = st.shapes[0].key;
+    st.shapes.forEach((sh) => { while (prefix && !sh.key.startsWith(prefix)) prefix = prefix.slice(0, -1); });
+    const cut = Math.max(prefix.lastIndexOf('.'), prefix.lastIndexOf('_'), prefix.lastIndexOf(' ')) + 1;
+    st.shapes.forEach((sh) => { sh.label = cut > 0 ? sh.key.slice(cut) || sh.key : sh.key; });
+    $('shapeCount').textContent = `${st.shapes.length}個`;
+    $('shapeFilter').value = '';
+    renderShapes('');
+  }
+  const SHAPE_ROWS = 60;
+  function renderShapes(query) {
+    const box = $('shapes'); box.textContent = '';
+    const q = query.trim().toLowerCase();
+    const hits = st.shapes.filter((sh) => !q || sh.hay.includes(q) || sh.mesh.morphTargetInfluences[sh.index] > 0);
+    const shown = hits.slice(0, SHAPE_ROWS);
+    shown.forEach((sh, i) => {
+      const row = document.createElement('div'); row.className = 'shape';
+      const id = `shape_${i}`;
+      const label = document.createElement('label');
+      label.htmlFor = id; label.textContent = sh.label || sh.key; label.title = `${sh.mesh.name || ''} / ${sh.key}`;
+      const range = document.createElement('input');
+      range.type = 'range'; range.min = 0; range.max = 100; range.step = 5; range.id = id;
+      range.value = Math.round((sh.mesh.morphTargetInfluences[sh.index] || 0) * 100);
+      const out = document.createElement('output'); out.textContent = `${range.value}%`;
+      range.addEventListener('input', () => {
+        sh.mesh.morphTargetInfluences[sh.index] = +range.value / 100;
+        out.textContent = `${range.value}%`;
+        schedule(true);
+      });
+      row.append(label, range, out);
+      box.append(row);
+    });
+    $('shapeMore').textContent = hits.length > shown.length
+      ? `ほかに${hits.length - shown.length}個あります。名前で絞り込んでください。`
+      : (hits.length ? '' : '見つかりませんでした。');
+  }
+
+  // ---------- settings ----------
+  const fmt = {
+    startDeg: (v) => `${v}°`, elev: (v) => `${v}°`, arms: (v) => `${v}°`, size: (v) => `${v}%`,
+    brightness: (v) => (v > 0 ? '+' : '') + v, contrast: (v) => `${v}%`, shading: (v) => `${v}%`, speed: (v) => `${(v / 60).toFixed(2)}秒`,
+  };
+  function syncOutputs() { for (const k in fmt) { const o = $(k + 'Out'); if (o) o.textContent = fmt[k](+$(k).value); } }
+  const readRange = {
+    startDeg: [(v) => v, true], elev: [(v) => v, true], arms: [(v) => v, true], shading: [(v) => v / 100, true],
+    size: [(v) => v / 100, false], brightness: [(v) => v / 100, false], contrast: [(v) => v / 100, false], speed: [(v) => v, false],
+  };
+  for (const k in readRange) {
+    $(k).addEventListener('input', () => {
+      S[k] = readRange[k][0](+$(k).value); syncOutputs();
+      if (k === 'speed') { if (st.auto) setAuto(true); return; }
+      schedule(readRange[k][1]);
+    });
+  }
+  document.querySelectorAll('input[type=radio]').forEach((r) => r.addEventListener('change', () => {
+    if (!r.checked) return;
+    if (r.name === 'bg') { S.bg = r.value; schedule(false); }
+    else if (r.name === 'smooth') { S.smooth = +r.value; schedule(false); }
+    else { S[r.name] = r.value; schedule(false); }
+  }));
+  function filterRows(box, query) {
+    const q = query.trim().toLowerCase();
+    [...box.children].forEach((row) => {
+      const hay = row.dataset.name || row.textContent.toLowerCase();
+      row.hidden = q.length > 0 && !hay.includes(q);
+    });
+  }
+  $('shapeFilter').addEventListener('input', (e) => renderShapes(e.target.value));
+  $('partFilter').addEventListener('input', (e) => filterRows($('parts'), e.target.value));
+  $('shapeReset').addEventListener('click', () => {
+    (st.shapes || []).forEach((sh) => { sh.mesh.morphTargetInfluences[sh.index] = sh.base; });
+    renderShapes($('shapeFilter').value);
+    schedule(true);
+  });
+  $('cutout').addEventListener('change', (e) => { S.cutout = e.target.checked; applyCutout(); schedule(true); });
+  $('autoLevels').addEventListener('change', (e) => { S.autoLevels = e.target.checked; schedule(false); });
+  $('shadow').addEventListener('change', (e) => { S.shadow = e.target.checked; schedule(false); });
+  $('autoStart').addEventListener('change', (e) => { S.autoStart = e.target.checked; });
+  $('name').addEventListener('input', (e) => {
+    const clean = e.target.value.replace(/[^\x20-\x7e]/g, '');
+    if (clean !== e.target.value) e.target.value = clean;
+    S.name = clean; schedule(false);
+  });
+
+  // ---------- files ----------
+  function addFiles(list) {
+    const arr = [...list]; if (!arr.length) return;
+    let model = null;
+    for (const f of arr) if (MODEL_EXT.test(f.name.toLowerCase())) model = f;
+    if (model) {
+      // A different model replaces the previous session outright: drop every file, converted
+      // texture and blob URL carried over from it so nothing stale leaks into the new one.
+      st.fileUrls.forEach((u) => URL.revokeObjectURL(u));
+      st.psdUrls.forEach((u) => URL.revokeObjectURL(u));
+      st.files = new Map(); st.psdUrls = new Map(); st.psdFailed = new Set(); st.fileUrls = new Map();
+      st.modelFile = model;
+    }
+    const odd = [];
+    for (const f of arr) {
+      const n = f.name.toLowerCase();
+      if (MODEL_EXT.test(n)) continue;
+      // Re-selecting a same-named file (e.g. a corrected PSD) must not keep the old conversion.
+      if (st.psdUrls.has(n)) { URL.revokeObjectURL(st.psdUrls.get(n)); st.psdUrls.delete(n); }
+      if (st.fileUrls.has(n)) { URL.revokeObjectURL(st.fileUrls.get(n)); st.fileUrls.delete(n); }
+      st.psdFailed.delete(n);
+      st.files.set(n, f);
+      if (!IMAGE_EXT.test(n)) odd.push(n);
+    }
+    if (!st.modelFile) {
+      if (odd.some((n) => n.endsWith('.unitypackage'))) setStatus('.unitypackage はそのままでは読めません。中に入っているFBXとテクスチャを選ぶか、VRMに書き出したものを使ってください。', true);
+      else if (arr.some((f) => IMAGE_EXT.test(f.name.toLowerCase()))) setStatus('テクスチャだけが選ばれています。モデル（FBX・VRM）も一緒に選んでください。', true);
+      else if (odd.some((n) => n.endsWith('.zip'))) setStatus('zipは先に展開して、中のFBX・VRMとテクスチャを選んでください。', true);
+      else setStatus('モデルファイル（FBX・VRM）が見つかりませんでした。', true);
+      return;
+    }
+    loadModel();
+  }
+  $('pickBtn').addEventListener('click', () => $('fileInput').click());
+  scr.addEventListener('click', (e) => {
+    if (!st.wrap) { $('fileInput').click(); return; }
+    if (!st.eraser) return;
+    const r = scr.getBoundingClientRect();
+    const px = Math.floor((e.clientX - r.left) / r.width * 160);
+    const py = Math.floor((e.clientY - r.top) / r.height * 144);
+    eraseAt(px, py);
+  });
+  $('eraser').addEventListener('click', () => { st.eraser = !st.eraser; updateEraser(); });
+  $('eraseUndo').addEventListener('click', restoreErased);
+  $('fileInput').addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });
+  const dz = $('dropZone');
+  ['dragenter', 'dragover'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop', (e) => addFiles(e.dataTransfer.files));
+
+  // ---------- export ----------
+  let dlPromise = null;
+  function getDownloads() {
+    if (!dlPromise) dlPromise = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(() => null) : Promise.resolve(undefined);
+    return dlPromise;
+  }
+  getDownloads().then((d) => { if (d === null) { st.noDownloads = true; updateExport(); } });
+  function updateExport() {
+    const ok = !!st.plan && !st.noDownloads && !st.exporting;
+    $('saveRom').disabled = !ok; $('saveGif').disabled = !ok;
+    $('saveRom').textContent = ok ? `ROMをダウンロード（${st.romSize / 1024}KB）` : 'ROMをダウンロード（.zip）';
+    if (st.noDownloads) $('exportHint').textContent = 'この画面ではファイルを保存できません。claude.ai で開くと保存できます。';
+  }
+  async function save(filename, bytes) {
+    const d = await getDownloads();
+    if (d) {
+      try { await d.save({ filename, data: new Blob([bytes]) }); setStatus(`${filename} を保存しました。`); }
+      catch (e) {
+        if (e && e.code === 'declined') setStatus('保存をキャンセルしました。');
+        else if (e && e.code === 'rate_limited') setStatus('保存の確認画面がすでに開いています。そちらで選んでください。', true);
+        else setStatus(`保存できませんでした（${(e && e.code) || e}）。`, true);
+      }
+      return;
+    }
+    if (d === undefined) {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes])); a.download = filename;
+      document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      setStatus(`${filename} を保存しました。`);
+    }
+  }
+  function fileStem() { return (S.name || 'avatar').replace(/[^A-Za-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'avatar'; }
+  async function buildAllFramings(plan) {
+    const out = [];
+    for (let i = 0; i < plan.list.length; i++) {
+      const fr = plan.list[i];
+      let e = st.cache.get(`${fr.z}:${fr.p}`);
+      if (!e) {
+        setStatus(`ROM用に変換しています…（${i + 1}/${plan.list.length}）`, false, false);
+        await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+        if (st.plan !== plan) return null;          // settings changed mid-export
+        e = buildInto(fr);
+      }
+      out.push(...e.frames);
+    }
+    return st.plan === plan ? out : null;
+  }
+  function makeGif() {
+    const delay = Math.max(2, Math.round(S.speed * 100 / 60));
+    const useColor = S.color && st.palettes;
+    const colors = useColor ? [].concat(...st.palettes) : PALETTES[S.palette];
+    const set = shown();
+    const screens = set.map((f, i) => {
+      const sc = GB.composeScreen(st.stat, f, i);
+      if (!useColor) return sc.lev;
+      const idx = new Uint8Array(sc.lev.length);
+      for (let p = 0; p < idx.length; p++) idx[p] = sc.pal[p] * 4 + sc.lev[p];
+      return idx;
+    });
+    return GB.gifEncode(screens, 160, 144, colors, delay, 2);
+  }
+  $('saveGif').addEventListener('click', () => { if (shown()) save(`${fileStem()}_turntable.gif`, makeGif()); });
+  $('saveRom').addEventListener('click', async () => {
+    if (!st.plan || st.exporting) return;
+    st.exporting = true; updateExport();
+    try { await exportRom(); } finally { st.exporting = false; updateExport(); }
+  });
+  async function exportRom() {
+    const plan = st.plan, stat = st.stat, palettes = st.palettes;
+    setStatus('ROMを作っています…', false, false);
+    const all = await buildAllFramings(plan);
+    if (!all) { setStatus('書き出し中に設定が変わったので中断しました。もう一度「ROMをダウンロード」を押してください。', true); return; }
+    const rom = GB.buildRom(stat, all, { speed: S.speed, auto: S.autoStart, directions: S.count,
+      zoomLevels: plan.zoomCounts.length, zoomCounts: plan.zoomCounts, bases: plan.bases,
+      palettes: S.color ? palettes : null });
+    const s = fileStem();
+    const readme = [
+      `${stat.name} - アバタービューアROM`, '',
+      '■ 遊び方',
+      `・${s}.gb を mGBA、SameBoy、BGB などのエミュレータで開きます。`,
+      '・実機では、MBC5対応のフラッシュカートリッジに書き込んで起動します。',
+      S.color ? '・カラー版です。ゲームボーイカラーでは色付き、初代ゲームボーイでは白黒で起動します。' : '・初代ゲームボーイ用の白黒ROMです。', '',
+      '■ 操作',
+      '・十字キー左右：向きを変える（長押しで連続）',
+      plan.list.length > 1 ? '・十字キー上下：見る場所を上下に動かす' : null,
+      plan.zoomCounts.length > 1 ? `・SELECT＋十字キー上下：ズーム（${plan.zoomCounts.length}段、全身から顔まで）` : null,
+      '・A または START：自動回転のオン／オフ',
+      '・B：色の反転', '',
+      `■ 中身：${S.count}方向 × ${plan.list.length}構図、${rom.length / 1024}KB、MBC5${S.color ? '、8パレット' : ''}`, '',
+      'アバターの画像を含むため、公開や配布をするときはモデルの利用規約に従ってください。',
+      'ROMや画像の有償での販売・配布はできません。動画投稿や配信で使うときは、',
+      '「AVATAR BOY https://youjo-hub.github.io/AVATAR-BOY/」のようにクレジットを書いてください。', '',
+      'Made with AVATAR BOY', '',
+    ].filter((l) => l !== null).join('\r\n');
+    const zipBytes = await GB.zip([
+      { name: `${s}.gb`, data: rom },
+      { name: `${s}_turntable.gif`, data: makeGif() },
+      { name: 'README.txt', data: GB.utf8(readme) },
+    ]);
+    await save(`${s}_gameboy.zip`, zipBytes);
+  }
+
+  // ---------- start ----------
+  syncOutputs();
+  showMessage('NO AVATAR', ['INSERT', 'AVATAR']);
+})();
+
+</script>
+</body></html>
